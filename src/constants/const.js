@@ -9,3 +9,5 @@ export const SIZES = [
 ];
 
 export const SEXES = ['Всі', 'Чоловічий', 'Жіночий', 'Унісекс'];
+
+export const ROLE = ['User', 'Admin'];

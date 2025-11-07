@@ -1,5 +1,7 @@
 import { model, Schema } from 'mongoose';
 
+import { ROLE } from '../constants/const.js';
+
 const userSchema = new Schema(
   {
     username: {
@@ -37,7 +39,13 @@ const userSchema = new Schema(
       trim: true,
       default: 'https://ac.goit.global/fullstack/react/default-avatar.jpg',
     },
-
+    role: {
+      type: String,
+      required: true,
+      trim: true,
+      enum: ROLE,
+      default: 'User',
+    },
     city: {
       type: String,
       required: false,
@@ -65,7 +73,7 @@ const userSchema = new Schema(
 );
 
 userSchema.pre('save', function (next) {
-  if(!this.username) {
+  if (!this.username) {
     this.username = this.email;
   }
   next();

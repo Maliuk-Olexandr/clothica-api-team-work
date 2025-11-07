@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 
-import { SIZES } from '../constants/sizes.js';
+import { SIZES } from '../constants/const.js';
 
 const orderSchema = new Schema(
   {
