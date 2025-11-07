@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { createNote, deleteNote, getAllNotes, getNoteById, updateNote } from '../controllers/notesController.js';
 import { celebrate } from 'celebrate';
+
+import { createNote, deleteNote, getAllNotes, getNoteById, updateNote } from '../controllers/notesController.js';
 import {
   getAllNotesSchema,
   noteIdSchema,
