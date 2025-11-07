@@ -9,7 +9,7 @@ import { getAllGoods, getGoodById } from '../controllers/goodsController.js';
 
 const router = Router();
 
-router.get('/goods', celebrate(getAllGoodsSchema), getAllGoods);
-router.get('/goods/:goodId', celebrate(goodIdSchema), getGoodById);
+router.get('/api/goods', celebrate(getAllGoodsSchema), getAllGoods);
+router.get('/api/goods/:goodId', celebrate(goodIdSchema), getGoodById);
 
 export default router;

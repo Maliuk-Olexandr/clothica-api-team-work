@@ -13,6 +13,7 @@ import notesRoutes from './routes/notesRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import categoriesRoutes from './routes/categoriesRoutes.js';
+import goodsRoutes from './routes/goodsRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3030;
@@ -26,6 +27,7 @@ app.use(authRoutes);
 app.use(notesRoutes);
 app.use(userRoutes);
 app.use(categoriesRoutes);
+app.use(goodsRoutes);
 
 app.use(notFoundHandler);
 app.use(errors());
