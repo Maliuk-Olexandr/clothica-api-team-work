@@ -11,6 +11,7 @@ import { updateUserSchema } from '../validations/userValidation.js';
 // import { upload } from '../middleware/multer.js';
 
 const router = Router();
+router.use(authenticate);
 
 // router.patch(
 //   '/users/me/avatar',
@@ -19,7 +20,7 @@ const router = Router();
 //   updateUserAvatar,
 // );
 
-router.get('/users', authenticate, getCurrentUser);
-router.patch('/users', authenticate, celebrate(updateUserSchema), updateUser);
+router.get('/api/users/me', getCurrentUser);
+router.patch('/api/users/me', celebrate(updateUserSchema), updateUser);
 
 export default router;
