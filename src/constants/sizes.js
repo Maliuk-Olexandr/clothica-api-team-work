@@ -8,4 +8,4 @@ export const SIZES = [
   'xxl',
 ];
 
-export const SEXES = ['all', 'male', 'female', 'unisex'];
+export const SEXES = ['Всі', 'Чоловічий', 'Жіночий', 'Унісекс'];
