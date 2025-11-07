@@ -12,16 +12,21 @@ const orderSchema = new Schema(
         size: {
           type: String,
           enum: SIZES,
-          required: true,
+          required: false,
         },
         gender: {
           type: String,
           enum: ['Всі', 'Чоловічий', 'Жіночий', 'Унісекс'],
-          required: true,
+          required: false,
           trim: true,
         },
       },
     ],
+    deliveryCost: {
+      required: false,
+      value: { type: Number, required: true },
+      currency: { type: String, required: true, default: 'грн' },
+    },
     totalPrice: {
       value: { type: Number, required: true },
       currency: { type: String, required: true, default: 'грн' },
