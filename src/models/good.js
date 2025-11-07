@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 
-import { SEXES, SIZES } from '../constants/sizes.js';
+import { SEXES, SIZES } from '../constants/const.js';
 
 const goodSchema = new Schema(
   {

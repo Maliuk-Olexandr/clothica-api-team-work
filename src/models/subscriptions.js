@@ -7,8 +7,10 @@ const orderSchema = new Schema(
       required: true,
       trim: true,
     },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: false },
   },
   { timestamps: true },
+
 );
 
 const Subscription = model('Subscription', orderSchema);

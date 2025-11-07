@@ -1,14 +1,15 @@
-import createHttpError from 'http-errors';
-import { User } from '../models/user.js';
-import bcrypt from 'bcrypt';
-import { createSession, setSessionCookies } from '../services/auth.js';
-import { Session } from '../models/session.js';
-
-import jwt from 'jsonwebtoken';
-import { sendEmail } from '../utils/sendMail.js';
 import path from 'node:path';
 import fs from 'node:fs/promises';
+
+import createHttpError from 'http-errors';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import handlebars from 'handlebars';
+
+import { createSession, setSessionCookies } from '../services/auth.js';
+import { Session } from '../models/session.js';
+import { User } from '../models/user.js';
+import { sendEmail } from '../utils/sendMail.js';
 
 // Register a new user
 export const registerUser = async (req, res, next) => {
@@ -109,7 +110,6 @@ export const requestResetEmail = async (req, res, next) => {
       html,
     });
   } catch {
-
     // catch (error) {
     // console.error('Email sending error:', error);
 

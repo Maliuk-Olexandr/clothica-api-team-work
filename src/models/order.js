@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 
-import { SIZES } from '../constants/sizes.js';
+import { SIZES } from '../constants/const.js';
 
 const orderSchema = new Schema(
   {
@@ -13,6 +13,12 @@ const orderSchema = new Schema(
           type: String,
           enum: SIZES,
           required: true,
+        },
+        gender: {
+          type: String,
+          enum: ['Всі', 'Чоловічий', 'Жіночий', 'Унісекс'],
+          required: true,
+          trim: true,
         },
       },
     ],
