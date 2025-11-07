@@ -6,8 +6,9 @@ const userSchema = new Schema(
       type: String,
       trim: true,
       required: true,
+      maxlength: 32,
     },
-    userSername: {
+    userSurname: {
       type: String,
       trim: true,
       required: false,
@@ -17,12 +18,11 @@ const userSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-      lowercase: true,
     },
+    // ✅ Email лише для підписки — неунікальний, не обов’язковий
     email: {
       type: String,
       required: false,
-      unique: true,
       trim: true,
       lowercase: true,
     },
@@ -30,47 +30,44 @@ const userSchema = new Schema(
       type: String,
       required: true,
       minlength: 8,
+      maxlength: 128,
     },
     avatar: {
       type: String,
-      required: false,
       trim: true,
       default: 'https://ac.goit.global/fullstack/react/default-avatar.jpg',
     },
-
     city: {
       type: String,
-      required: false,
       trim: true,
     },
     postNumber: {
       type: String,
-      required: false,
       trim: true,
     },
     order: {
       type: Schema.Types.ObjectId,
       ref: 'Order',
-      required: false,
     },
     comments: [
       {
         type: Schema.Types.ObjectId,
         ref: 'Comment',
-        required: false,
       },
     ],
   },
   { timestamps: true, versionKey: false },
 );
 
+// Якщо не вказано ім’я — використовуємо номер телефону
 userSchema.pre('save', function (next) {
-  if(!this.username) {
-    this.username = this.email;
+  if (!this.username) {
+    this.username = this.phone;
   }
   next();
 });
 
+// Видаляємо пароль при серіалізації
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;

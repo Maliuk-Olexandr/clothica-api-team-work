@@ -1,48 +1,70 @@
-import path from 'node:path';
-import fs from 'node:fs/promises';
-
 import createHttpError from 'http-errors';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import handlebars from 'handlebars';
 
 import { createSession, setSessionCookies } from '../services/auth.js';
 import { Session } from '../models/session.js';
 import { User } from '../models/user.js';
-import { sendEmail } from '../utils/sendMail.js';
 
-// Register a new user
+// 📱 Реєстрація нового користувача
 export const registerUser = async (req, res, next) => {
-  const { email, password } = req.body;
-  const existingUser = await User.findOne({ email });
+  const { phone, password, username } = req.body;
+
+  const existingUser = await User.findOne({ phone });
   if (existingUser) {
-    return next(createHttpError(400, 'Email in use'));
+    return next(createHttpError(400, 'Користувач з таким номером вже існує'));
   }
+
   const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = await User.create({ email, password: hashedPassword });
+  const newUser = await User.create({
+    phone,
+    password: hashedPassword,
+    username,
+  });
+
   const newSession = await createSession(newUser._id);
   setSessionCookies(res, newSession);
-  res.status(201).json({ newUser });
+
+  res.status(201).json({
+    message: 'Користувача успішно створено',
+    user: {
+      id: newUser._id,
+      phone: newUser.phone,
+      username: newUser.username,
+    },
+  });
 };
 
-// Login an existing user
+// 🔑 Вхід користувача
 export const loginUser = async (req, res, next) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
+  const { phone, password } = req.body;
+
+  const user = await User.findOne({ phone });
   if (!user) {
-    return next(createHttpError(401, 'Invalid credentials'));
+    return next(createHttpError(401, 'Невірний номер телефону або пароль'));
   }
+
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
-    return next(createHttpError(401, 'Invalid credentials'));
+    return next(createHttpError(401, 'Невірний номер телефону або пароль'));
   }
+
   await Session.deleteOne({ userId: user._id });
+
   const newSession = await createSession(user._id);
   setSessionCookies(res, newSession);
-  res.status(200).json({ user });
+
+  res.status(200).json({
+    message: 'Вхід успішний',
+    user: {
+      id: user._id,
+      phone: user.phone,
+      username: user.username,
+    },
+  });
 };
 
-// Logout a user
+// 🚪 Вихід користувача
 export const logoutUser = async (req, res) => {
   const { sessionId } = req.cookies;
   if (sessionId) {
@@ -54,74 +76,60 @@ export const logoutUser = async (req, res) => {
   res.status(204).send();
 };
 
-// Refresh user session
+// 🔄 Оновлення сесії користувача
 export const refreshUserSession = async (req, res, next) => {
   const session = await Session.findOne({
     _id: req.cookies.sessionId,
     refreshToken: req.cookies.refreshToken,
   });
+
   if (!session) {
-    return next(createHttpError(401, 'Session not found'));
+    return next(createHttpError(401, 'Сесію не знайдено'));
   }
-  const isSessionTokenExpired =
-    new Date() > new Date(session.refreshTokenValidUntil);
-  if (isSessionTokenExpired) {
-    return next(createHttpError(401, 'Session token expired'));
+
+  const isExpired = new Date() > new Date(session.refreshTokenValidUntil);
+  if (isExpired) {
+    return next(createHttpError(401, 'Токен сесії прострочений'));
   }
+
   await Session.deleteOne({
     _id: session._id,
     refreshToken: req.cookies.refreshToken,
   });
+
   const newSession = await createSession(session.userId);
   setSessionCookies(res, newSession);
-  res.status(200).json({ message: 'Session refreshed' });
+
+  res.status(200).json({ message: 'Сесію оновлено' });
 };
 
-// Request password reset email
-export const requestResetEmail = async (req, res, next) => {
-  const { email } = req.body;
-  const user = await User.findOne({ email });
+// 📱 Запит на скидання паролю через телефон
+export const requestResetPhone = async (req, res, next) => {
+  const { phone } = req.body;
+  const user = await User.findOne({ phone });
+
   if (!user) {
+    // не розкриваємо, чи користувача існує
     return res
       .status(200)
-      .json({ message: 'Password reset email sent successfully' });
+      .json({ message: 'Якщо користувач існує, SMS надіслано' });
   }
+
   const resetToken = jwt.sign(
-    {
-      sub: user._id,
-      email,
-    },
+    { sub: user._id, phone },
     process.env.JWT_SECRET,
     { expiresIn: '15m' },
   );
-  const templatePath = path.resolve('src/templates/reset-password-email.html');
-  const templateSource = await fs.readFile(templatePath, 'utf-8');
-  const template = handlebars.compile(templateSource);
-  const html = template({
-    name: user.username,
-    link: `${process.env.FRONTEND_DOMAIN}/reset-password?token=${resetToken}`,
+
+  // TODO: 🔧 Тут у продакшні буде інтеграція з SMS API (наприклад, Twilio)
+  console.log(`🔐 SMS токен для ${phone}: ${resetToken}`);
+
+  res.status(200).json({
+    message: 'SMS із посиланням на відновлення паролю надіслано',
   });
-
-  try {
-    await sendEmail({
-      from: process.env.SMTP_FROM,
-      to: email,
-      subject: 'Password Reset Request',
-      html,
-    });
-  } catch {
-    // catch (error) {
-    // console.error('Email sending error:', error);
-
-    next(
-      createHttpError(500, 'Failed to send the email, please try again later.'),
-    );
-    return;
-  }
-  res.status(200).json({ message: 'Password reset email sent successfully' });
 };
 
-// Reset password
+// 🔐 Скидання паролю
 export const resetPassword = async (req, res, next) => {
   const { token, password } = req.body;
 
@@ -129,17 +137,18 @@ export const resetPassword = async (req, res, next) => {
   try {
     payload = jwt.verify(token, process.env.JWT_SECRET);
   } catch {
-    return next(createHttpError(401, 'Invalid or expired token'));
+    return next(createHttpError(401, 'Недійсний або прострочений токен'));
   }
 
-  const user = await User.findOne({ _id: payload.sub, email: payload.email });
+  const user = await User.findOne({ _id: payload.sub, phone: payload.phone });
   if (!user) {
-    return next(createHttpError(404, 'User not found'));
+    return next(createHttpError(404, 'Користувача не знайдено'));
   }
+
   const hashedPassword = await bcrypt.hash(password, 10);
   user.password = hashedPassword;
   await user.save();
   await Session.deleteMany({ userId: user._id });
 
-  res.status(200).json({ message: 'Password reset successfully' });
+  res.status(200).json({ message: 'Пароль успішно змінено' });
 };

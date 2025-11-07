@@ -5,19 +5,42 @@ import {
   loginUser,
   logoutUser,
   refreshUserSession,
-  requestResetEmail,
+  requestResetPhone,
   resetPassword,
 } from '../controllers/authController.js';
-import { registerUserSchema, loginUserSchema, requestResetEmailSchema, resetPasswordSchema } from '../validations/authValidation.js';
+import {
+  registerUserSchema,
+  loginUserSchema,
+  requestResetPhoneSchema,
+  resetPasswordSchema,
+} from '../validations/authValidation.js';
 
 const router = Router();
 
+// 🔹 Реєстрація користувача (по телефону)
 router.post('/auth/register', celebrate(registerUserSchema), registerUser);
+
+// 🔹 Логін користувача (по телефону)
 router.post('/auth/login', celebrate(loginUserSchema), loginUser);
+
+// 🔹 Вихід користувача
 router.post('/auth/logout', logoutUser);
+
+// 🔹 Оновлення сесії
 router.post('/auth/refresh', refreshUserSession);
 
-router.post('/auth/request-reset-email', celebrate(requestResetEmailSchema), requestResetEmail);
-router.post('/auth/reset-password', celebrate(resetPasswordSchema), resetPassword);
+// 🔹 Запит на скидання паролю через телефон (SMS)
+router.post(
+  '/auth/request-reset-phone',
+  celebrate(requestResetPhoneSchema),
+  requestResetPhone,
+);
+
+// 🔹 Скидання паролю
+router.post(
+  '/auth/reset-password',
+  celebrate(resetPasswordSchema),
+  resetPassword,
+);
 
 export default router;
