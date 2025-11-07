@@ -1,14 +1,5 @@
-export const SIZES = [
-  'xxs',
-  'xs',
-  's',
-  'm',
-  'l',
-  'xl',
-  'xxl',
-];
-
-export const SEXES = ['Всі', 'Чоловічий', 'Жіночий', 'Унісекс'];
+export const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+export const GENDER = ['all', 'man', 'women', 'unisex'];
 
 export const ROLE = ['User', 'Admin'];
 
