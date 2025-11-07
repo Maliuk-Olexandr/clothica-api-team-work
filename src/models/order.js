@@ -14,6 +14,12 @@ const orderSchema = new Schema(
           enum: SIZES,
           required: true,
         },
+        gender: {
+          type: String,
+          enum: ['Всі', 'Чоловічий', 'Жіночий', 'Унісекс'],
+          required: true,
+          trim: true,
+        },
       },
     ],
     totalPrice: {

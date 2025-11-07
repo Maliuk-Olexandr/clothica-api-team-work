@@ -19,6 +19,13 @@ const userSchema = new Schema(
       trim: true,
       lowercase: true,
     },
+    email: {
+      type: String,
+      required: false,
+      unique: true,
+      trim: true,
+      lowercase: true,
+    },
     password: {
       type: String,
       required: true,
