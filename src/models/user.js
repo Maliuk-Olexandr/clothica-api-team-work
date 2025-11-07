@@ -5,9 +5,14 @@ const userSchema = new Schema(
     username: {
       type: String,
       trim: true,
+      required: true,
+    },
+    userSername: {
+      type: String,
+      trim: true,
       required: false,
     },
-    email: {
+    phone: {
       type: String,
       required: true,
       unique: true,
@@ -25,6 +30,29 @@ const userSchema = new Schema(
       trim: true,
       default: 'https://ac.goit.global/fullstack/react/default-avatar.jpg',
     },
+
+    city: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    postNumber: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    order: {
+      type: Schema.Types.ObjectId,
+      ref: 'Order',
+      required: false,
+    },
+    comments: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Comment',
+        required: false,
+      },
+    ],
   },
   { timestamps: true, versionKey: false },
 );
