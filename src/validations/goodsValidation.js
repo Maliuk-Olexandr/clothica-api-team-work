@@ -1,8 +1,8 @@
 import { Joi, Segments } from 'celebrate';
 
-import { SIZES } from '../constants/const.js';
+import { SIZES, SEXES } from '../constants/const.js';
 
-export const getAllNotesSchema = {
+export const getAllGoodsSchema = {
   [Segments.QUERY]: Joi.object({
     page: Joi.number().integer().min(1).default(1),
     perPage: Joi.number().integer().min(5).max(20).default(12),
@@ -10,6 +10,8 @@ export const getAllNotesSchema = {
       .valid(...SIZES)
       .optional(),
     price: Joi.number().integer().min(0).max(2000),
-    search: Joi.string().trim().allow(''),
+    sex: Joi.string()
+      .valid(...SEXES)
+      .default(SEXES[0]),
   }),
 };
