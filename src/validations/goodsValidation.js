@@ -1,7 +1,7 @@
 import { Joi, Segments } from 'celebrate';
 import { isValidObjectId } from 'mongoose';
 
-const CATOGORIES = [
+const CATEGORIES = [
   'all',
   '690c9ce6a6276289c98fc006',
   '690c9ce6a6276289c98fc007',
@@ -17,9 +17,9 @@ import { GENDER, SIZES } from '../constants/const.js';
 export const getAllGoodsSchema = {
   [Segments.QUERY]: Joi.object({
     page: Joi.number().integer().min(1).default(1),
-    perPage: Joi.number().integer().min(5).max(20).default(12),
+    perPage: Joi.number().integer().min(5).max(20).default(8),
     category: Joi.string()
-      .valid(...CATOGORIES)
+      .valid(...CATEGORIES)
       .default('all'),
     size: Joi.string()
       .valid(...SIZES)
