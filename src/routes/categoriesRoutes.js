@@ -9,6 +9,6 @@ import { getAllCategoriesSchema } from '../validations/categoriesValidation.js';
 
 const router = Router();
 
-router.get('/categories', celebrate(getAllCategoriesSchema), getAllCategories);
+router.get('/api/categories', celebrate(getAllCategoriesSchema), getAllCategories);
 
 export default router;

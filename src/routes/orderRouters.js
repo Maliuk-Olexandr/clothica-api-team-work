@@ -12,11 +12,11 @@ import { authenticate } from '../middleware/authenticate.js';
 
 const router = Router();
 
-router.use('/orders',authenticate);
+router.use('/api/orders',authenticate);
 
-router.get('/orders', getAllOrders);
-router.get('/orders/:orderId', getOrderById);
-router.post('/orders', createOrder);
-router.patch('/orders/:orderId/status', updateOrderStatus);
+router.get('/api/orders', getAllOrders);
+router.get('/api/orders/:orderId', getOrderById);
+router.post('/api/orders', createOrder);
+router.patch('/api/orders/:orderId/status', updateOrderStatus);
 
 export default router;
