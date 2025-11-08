@@ -1,5 +1,6 @@
 import createHttpError from 'http-errors';
 
+import '../models/feedback.js'; //need delete after feedbacks implementation
 import Good from '../models/good.js';
 
 export const getAllGoods = async (req, res) => {
@@ -41,7 +42,10 @@ export const getAllGoods = async (req, res) => {
     goodsQuery
       .skip(skip)
       .limit(perPage)
-      .sort({ [sortBy]: sortOrder }),
+      .sort({ [sortBy]: sortOrder })
+      .populate('category', 'name')
+      .populate('feedbacks', 'rate description author productId date')
+      .exec(),
   ]);
 
   // Обчислюємо загальну кількість «сторінок»
@@ -61,7 +65,10 @@ export const getAllGoods = async (req, res) => {
 
 export const getGoodById = async (req, res, next) => {
   const { goodId } = req.params;
-  const good = await Good.findById(goodId);
+  const good = await Good.findById(goodId)
+    .populate('category', 'name')
+    .populate('feedbacks', 'rate description author productId date')
+    .exec();
   if (!good) {
     next(createHttpError(404, 'Good not found'));
     return;
