@@ -9,6 +9,10 @@ export const createFeedback = async (req, res, next) => {
       ...req.body,
       date: req.body.date || Date.now(),
       author: req.body.author,
+      description: req.body.description,
+      rating: req.body.rating,
+      productId: req.body.productId,
+      userId: req.user ? req.user._id : null,
     });
     res.status(201).json(newFeedback);
   } catch (error) {
@@ -23,23 +27,33 @@ export const createFeedback = async (req, res, next) => {
 
 export const getFeedbacks = async (req, res, next) => {
   try {
+    const { productId } = req.query;
     const page = Number(req.query.page) || 1;
     const perPage = Number(req.query.perPage) || 10;
     const skip = (page - 1) * perPage;
 
-    const [feedbacks, total] = await Promise.all([
-      Feedback.find()
+    const filter = {};
+    if (productId) {
+      filter.productId = productId;
+    }
+    const [feedbacks, totalFeedbacks] = await Promise.all([
+      Feedback.find(filter)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(perPage)
-        .populate('productId', 'name'),
-      Feedback.countDocuments(),
+        .populate('productId', 'name')
+        .populate('userId', 'username'),
+      Feedback.countDocuments(filter),
     ]);
+    // calculate total pages
+    const totalPages = Math.ceil(totalFeedbacks / perPage);
     res.status(200).json({
       feedbacks,
-      total,
+      productId,
+      totalFeedbacks,
       page,
       perPage,
+      totalPages,
     });
   } catch (error) {
     next(error);

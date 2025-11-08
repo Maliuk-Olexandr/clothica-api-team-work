@@ -14,8 +14,12 @@ const router = Router();
 
 router.get('/api/feedbacks', getFeedbacks);
 
-router.use(authenticate);
+// router.use(authenticate);
 
-router.post('/api/feedbacks', celebrate(feedbackValidationSchema), createFeedback);
+router.post(
+  '/api/feedbacks',
+  authenticate,celebrate(feedbackValidationSchema),
+  createFeedback,
+);
 
 export default router;

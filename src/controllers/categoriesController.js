@@ -9,9 +9,9 @@ export const getAllCategories = async (req, res) => {
   const categoriesQuery = Category.find();
 
   // make both queries in parallel
-  const [totalCategories, categories] = await Promise.all([
-    categoriesQuery.clone().countDocuments(),
+  const [categories, totalCategories] = await Promise.all([
     categoriesQuery.skip(skip).limit(perPage),
+    categoriesQuery.clone().countDocuments(),
   ]);
 
   // calculate total pages

@@ -1,0 +1,66 @@
+import mongoose from "mongoose";
+import { Joi, Segments } from "celebrate";
+
+import { SIZES, CURRENCIES, ORDER_STATUSES,GENDER } from "../constants/const.js";
+
+const objectValidator = (value, helpers) => {
+    if (!mongoose.Types.ObjectId.isValid(value)) {
+      return helpers.error('any.invalid');
+    }
+    return value;
+};
+
+export const orderIdSchema = {
+  [Segments.PARAMS]: Joi.object({
+    orderId: Joi.string().custom(objectValidator).required(),
+  }),
+};
+
+export const createOrderSchema = {
+  [Segments.BODY]: Joi.object({
+    userId: Joi.string().custom(objectValidator).required(),
+    orderNumber: Joi.string().optional(),
+    items: Joi.array()
+      .items(
+        Joi.object({
+          goodId: Joi.string()
+            .custom(objectValidator)
+            .required(),
+          quantity: Joi.number().integer().min(1).required(),
+          size: Joi.string().valid(...SIZES).optional(),
+          gender: Joi.string().valid(...GENDER).optional(),
+        })
+      )
+      .required(),
+    deliveryCost: Joi.object({
+      value: Joi.number().required(),
+      currency: Joi.string().valid(...CURRENCIES).default('грн'),
+    }),
+    totalPrice: Joi.object({
+      value: Joi.number().required(),
+      currency: Joi.string().valid(...CURRENCIES).default('грн'),
+    }).required(),
+    status: Joi.string().valid(...ORDER_STATUSES).required().default('Pending'),
+    shippingAddress: Joi.string().required(),
+  }),
+};
+
+export const updateOrderStatusSchema = {
+  [Segments.PARAMS]: Joi.object({
+    orderId: Joi.string().custom(objectValidator).required(),
+  }),
+  [Segments.BODY]: Joi.object({
+    status: Joi.string().valid(...ORDER_STATUSES).required(),
+  }),
+};
+
+export const getAllOrdersSchema = {
+  [Segments.QUERY]: Joi.object({
+    page: Joi.number().integer().min(1).default(1),
+    perPage: Joi.number().integer().default(10),
+    status: Joi.string()
+      .valid(...ORDER_STATUSES)
+      .optional(),
+    userId: Joi.string().custom(objectValidator).optional(),
+  }),
+};
