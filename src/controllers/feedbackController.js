@@ -42,7 +42,7 @@ export const getFeedbacks = async (req, res, next) => {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate('userId', 'username email');
+      .populate('productId', 'name');
 
     const total = await Feedback.countDocuments(filter);
 

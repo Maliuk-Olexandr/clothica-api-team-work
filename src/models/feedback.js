@@ -1,3 +1,4 @@
+import './good.js';
 import { Schema, model } from 'mongoose';
 
 const feedbackSchema = new Schema(
