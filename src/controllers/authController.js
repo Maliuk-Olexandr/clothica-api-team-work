@@ -1,48 +1,76 @@
-import path from 'node:path';
-import fs from 'node:fs/promises';
-
 import createHttpError from 'http-errors';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import handlebars from 'handlebars';
 
 import { createSession, setSessionCookies } from '../services/auth.js';
 import { Session } from '../models/session.js';
 import { User } from '../models/user.js';
-import { sendEmail } from '../utils/sendMail.js';
 
-// Register a new user
+// 📱 Register a new user
 export const registerUser = async (req, res, next) => {
-  const { email, password } = req.body;
-  const existingUser = await User.findOne({ email });
+  try {
+  const { phone, password, username } = req.body;
+
+  const existingUser = await User.findOne({ phone });
   if (existingUser) {
-    return next(createHttpError(400, 'Email in use'));
+    return next(
+      createHttpError(400, 'User with this phone number already exists'),
+    );
   }
+
   const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = await User.create({ email, password: hashedPassword });
+  const newUser = await User.create({
+    phone,
+    password: hashedPassword,
+    username,
+  });
+
   const newSession = await createSession(newUser._id);
   setSessionCookies(res, newSession);
-  res.status(201).json({ newUser });
+
+  res.status(201).json({
+    message: 'User successfully registered',
+    user: {
+      id: newUser._id,
+      phone: newUser.phone,
+      username: newUser.username,
+    },
+  });
+} catch (error) {
+  next(error);
+}
 };
 
-// Login an existing user
+// 🔑 User login
 export const loginUser = async (req, res, next) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
+  const { phone, password } = req.body;
+
+  const user = await User.findOne({ phone });
   if (!user) {
-    return next(createHttpError(401, 'Invalid credentials'));
+    return next(createHttpError(401, 'Invalid phone number or password'));
   }
+
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
-    return next(createHttpError(401, 'Invalid credentials'));
+    return next(createHttpError(401, 'Invalid phone number or password'));
   }
+
   await Session.deleteOne({ userId: user._id });
+
   const newSession = await createSession(user._id);
   setSessionCookies(res, newSession);
-  res.status(200).json({ user });
+
+  res.status(200).json({
+    message: 'Login successful',
+    user: {
+      id: user._id,
+      phone: user.phone,
+      username: user.username,
+    },
+  });
 };
 
-// Logout a user
+// 🚪 User logout
 export const logoutUser = async (req, res) => {
   const { sessionId } = req.cookies;
   if (sessionId) {
@@ -54,74 +82,60 @@ export const logoutUser = async (req, res) => {
   res.status(204).send();
 };
 
-// Refresh user session
+// 🔄 Refresh user session
 export const refreshUserSession = async (req, res, next) => {
   const session = await Session.findOne({
     _id: req.cookies.sessionId,
     refreshToken: req.cookies.refreshToken,
   });
+
   if (!session) {
     return next(createHttpError(401, 'Session not found'));
   }
-  const isSessionTokenExpired =
-    new Date() > new Date(session.refreshTokenValidUntil);
-  if (isSessionTokenExpired) {
+
+  const isExpired = new Date() > new Date(session.refreshTokenValidUntil);
+  if (isExpired) {
     return next(createHttpError(401, 'Session token expired'));
   }
+
   await Session.deleteOne({
     _id: session._id,
     refreshToken: req.cookies.refreshToken,
   });
+
   const newSession = await createSession(session.userId);
   setSessionCookies(res, newSession);
+
   res.status(200).json({ message: 'Session refreshed' });
 };
 
-// Request password reset email
-export const requestResetEmail = async (req, res, next) => {
-  const { email } = req.body;
-  const user = await User.findOne({ email });
+// 📱 Request password reset via phone
+export const requestResetPhone = async (req, res, next) => {
+  const { phone } = req.body;
+  const user = await User.findOne({ phone });
+
+  // Do not reveal whether the user exists
   if (!user) {
     return res
       .status(200)
-      .json({ message: 'Password reset email sent successfully' });
+      .json({ message: 'If this user exists, an SMS has been sent' });
   }
+
   const resetToken = jwt.sign(
-    {
-      sub: user._id,
-      email,
-    },
+    { sub: user._id, phone },
     process.env.JWT_SECRET,
     { expiresIn: '15m' },
   );
-  const templatePath = path.resolve('src/templates/reset-password-email.html');
-  const templateSource = await fs.readFile(templatePath, 'utf-8');
-  const template = handlebars.compile(templateSource);
-  const html = template({
-    name: user.username,
-    link: `${process.env.FRONTEND_DOMAIN}/reset-password?token=${resetToken}`,
+
+  // TODO: 🔧 Integrate with SMS API (e.g., Twilio)
+  console.log(`🔐 SMS reset token for ${phone}: ${resetToken}`);
+
+  res.status(200).json({
+    message: 'Password reset SMS sent successfully',
   });
-
-  try {
-    await sendEmail({
-      from: process.env.SMTP_FROM,
-      to: email,
-      subject: 'Password Reset Request',
-      html,
-    });
-  } catch {
-    // catch (error) {
-    // console.error('Email sending error:', error);
-
-    next(
-      createHttpError(500, 'Failed to send the email, please try again later.'),
-    );
-    return;
-  }
-  res.status(200).json({ message: 'Password reset email sent successfully' });
 };
 
-// Reset password
+// 🔐 Reset password
 export const resetPassword = async (req, res, next) => {
   const { token, password } = req.body;
 
@@ -132,14 +146,15 @@ export const resetPassword = async (req, res, next) => {
     return next(createHttpError(401, 'Invalid or expired token'));
   }
 
-  const user = await User.findOne({ _id: payload.sub, email: payload.email });
+  const user = await User.findOne({ _id: payload.sub, phone: payload.phone });
   if (!user) {
     return next(createHttpError(404, 'User not found'));
   }
+
   const hashedPassword = await bcrypt.hash(password, 10);
   user.password = hashedPassword;
   await user.save();
   await Session.deleteMany({ userId: user._id });
 
-  res.status(200).json({ message: 'Password reset successfully' });
+  res.status(200).json({ message: 'Password successfully updated' });
 };
