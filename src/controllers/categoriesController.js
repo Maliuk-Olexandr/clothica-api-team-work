@@ -2,24 +2,21 @@ import Category from '../models/category.js';
 
 export const getAllCategories = async (req, res) => {
   // get query params
-  const { page = 1, perPage = 4 } = req.query;
+  const page = Number(req.query.page) || 1;
+  const perPage = Number(req.query.perPage) || 4;
   const skip = (page - 1) * perPage;
 
-  // create base query, to which will add filters
-  const categoriesQuery = Category.find();
-
-  // make both queries in parallel
   const [categories, totalCategories] = await Promise.all([
-    categoriesQuery.skip(skip).limit(perPage),
-    categoriesQuery.clone().countDocuments(),
+    Category.find().sort({ createdAt: -1 }).skip(skip).limit(perPage),
+    Category.countDocuments(),
   ]);
 
   // calculate total pages
   const totalPages = Math.ceil(totalCategories / perPage);
 
   res.status(200).json({
-    page: Number(page),
-    perPage: Number(perPage),
+    page,
+    perPage,
     totalCategories,
     totalPages,
     categories,

@@ -1,9 +1,11 @@
 import { Joi, Segments } from 'celebrate';
 
+import { objectIdValidator } from '../utils/objectIdValidator.js';
+
+
 export const feedbackValidationSchema = {
   [Segments.BODY]: Joi.object().keys({
-    productId: Joi.string()
-      .required()
+    productId: Joi.string().custom(objectIdValidator).required()
       .messages({ 'any.required': 'Product ID is required' }),
 
     rate: Joi.number().integer().min(1).max(5).required().messages({

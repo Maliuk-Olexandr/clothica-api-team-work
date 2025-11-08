@@ -5,13 +5,13 @@ import Feedback from '../models/feedback.js';
 // 1. Публічний: СТВОРЕННЯ відгуку (POST /api/feedbacks)
 export const createFeedback = async (req, res, next) => {
   try {
+    const { rate, description, author, productId, date } = req.body;
     const newFeedback = await Feedback.create({
-      ...req.body,
-      date: req.body.date || Date.now(),
-      author: req.body.author,
-      description: req.body.description,
-      rating: req.body.rating,
-      productId: req.body.productId,
+      rate,
+      author,
+      description,
+      productId,
+      date: date || Date.now(),
       userId: req.user ? req.user._id : null,
     });
     res.status(201).json(newFeedback);
@@ -47,14 +47,16 @@ export const getFeedbacks = async (req, res, next) => {
     ]);
     // calculate total pages
     const totalPages = Math.ceil(totalFeedbacks / perPage);
-    res.status(200).json({
-      feedbacks,
-      productId,
-      totalFeedbacks,
-      page,
-      perPage,
-      totalPages,
-    });
+    res
+      .status(200)
+      .json({
+        page,
+        perPage,
+        totalPages,
+        productId,
+        totalFeedbacks,
+        feedbacks,
+      });
   } catch (error) {
     next(error);
   }

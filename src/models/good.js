@@ -30,7 +30,7 @@ const goodSchema = new Schema(
       {
         type: String,
         enum: SIZES,
-        required: true,
+        required: false,
       },
     ],
     description: {

@@ -8,7 +8,7 @@ const feedbackSchema = new Schema(
     date: { type: Date, required: true, default: Date.now },
     description: { type: String, required: true, trim: true },
     rate: { type: Number, required: true, min: 1, max: 5 },
-    category: { type: String, required: false, trim: false },
+    category: { type: String, required: false },
     productId: { type: Schema.Types.ObjectId, ref: 'Good', required: true },
   },
   { timestamps: true },

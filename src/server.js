@@ -9,8 +9,7 @@ import { connectMongoDB } from './db/connectMongoDB.js';
 import { logger } from './middleware/logger.js';
 import { notFoundHandler } from './middleware/notFoundHandler.js';
 import { errorHandler } from './middleware/errorHandler.js';
-// import notesRoutes from './routes/notesRoutes.js';
-// import authRoutes from './routes/authRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import feedbackRoutes from './routes/feedbackRoutes.js';
 import categoriesRoutes from './routes/categoriesRoutes.js';
@@ -31,8 +30,7 @@ app.use(goodsRoutes);
 app.use(feedbackRoutes);
 
 // protected routes
-// app.use(authRoutes);
-// app.use(notesRoutes);
+app.use(authRoutes);
 app.use(userRoutes);
 
 app.use(notFoundHandler);

@@ -1,30 +1,36 @@
-import createHttpError from "http-errors";
+import createHttpError from 'http-errors';
 
-import Order from "../models/order.js";
+import Order from '../models/order.js';
 
 /**
  * GET /api/orders
  * Отримати всі замовлення користувача (з пагінацією)
  */
-export const getAllOrders = async (req, res) => {
-  const page = Number(req.query.page) || 1;
-  const perPage = Number(req.query.perPage) || 10;
-  const skip = (page - 1) * perPage;
+export const getAllOrders = async (req, res, next) => {
+  try {
+    const page = Number(req.query.page) || 1;
+    const perPage = Number(req.query.perPage) || 10;
+    const skip = (page - 1) * perPage;
 
-  const [orders, totalOrders] = await Promise.all([
-    Order.find({ userId: req.user._id }).skip(skip).limit(perPage).exec(),
-    Order.countDocuments({ userId: req.user._id }),
-  ]);
+    const filter = req.user.role === 'admin' ? {} : { userId: req.user._id };
 
-  const totalPages = Math.ceil(totalOrders / perPage);
+    const [orders, totalOrders] = await Promise.all([
+      Order.find(filter).skip(skip).limit(perPage).exec(),
+      Order.countDocuments(filter),
+    ]);
 
-  res.status(200).json({
-    page,
-    perPage,
-    totalOrders,
-    totalPages,
-    orders,
-  });
+    const totalPages = Math.ceil(totalOrders / perPage);
+
+    res.status(200).json({
+      page,
+      perPage,
+      totalOrders,
+      totalPages,
+      orders,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 /**
@@ -32,25 +38,28 @@ export const getAllOrders = async (req, res) => {
  * Отримати замовлення за ID
  */
 export const getOrderById = async (req, res, next) => {
-  const { orderId } = req.params;
-  const order = await Order.findOne({ _id: orderId, userId: req.user._id });
-  if (!order) {
-    return next(createHttpError(404, "Замовлення не знайдено"));
+  try {
+    const { orderId } = req.params;
+    const order = await Order.findOne({ _id: orderId, userId: req.user._id });
+    if (!order) {
+      return next(createHttpError(404, 'Order not found'));
+    }
+    res.status(200).json(order);
+  } catch (error) {
+    next(error);
   }
-  res.status(200).json(order);
 };
 
 /**
  * POST /api/orders
  * Оформити нове замовлення
  */
-export const createOrder = async (req, res) => {
+export const createOrder = async (req, res, next) => {
   try {
     const order = await Order.create({ ...req.body, userId: req.user._id });
     res.status(201).json(order);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Помилка при створенні замовлення" });
+    next(error);
   }
 };
 
@@ -61,28 +70,22 @@ export const createOrder = async (req, res) => {
 
 export const updateOrderStatus = async (req, res, next) => {
   try {
-  if (req.user.role !== "admin") {
-    return next(createHttpError(403, "Доступ заборонено"));
-  }
+    if (req.user.role !== 'admin') {
+      return next(createHttpError(403, 'Access denied'));
+    }
 
-  const { orderId } = req.params;
-  const { status } = req.body;
+    const { orderId } = req.params;
+    const order = await Order.findOneAndUpdate({ _id: orderId }, req.body, {
+      new: true,
+    });
 
-  const order = await Order.findOneAndUpdate(
-    { _id: orderId, userId: req.user._id },
-    { status },
-    { new: true }
-  );
-
-  if (!order) {
-    return next(createHttpError(404, "Замовлення не знайдено"));
-  }
+    if (!order) {
+      return next(createHttpError(404, 'Order not found'));
+    }
 
     res.status(200).json(order);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Помилка при оновленні статусу замовлення" });
+    res.status(500).json({ message: 'Error updating order status' });
   }
 };
-
-

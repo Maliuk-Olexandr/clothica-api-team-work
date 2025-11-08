@@ -1,13 +1,18 @@
-import mongoose from "mongoose";
-import { Joi, Segments } from "celebrate";
+import mongoose from 'mongoose';
+import { Joi, Segments } from 'celebrate';
 
-import { SIZES, CURRENCIES, ORDER_STATUSES,GENDER } from "../constants/const.js";
+import {
+  SIZES,
+  CURRENCIES,
+  ORDER_STATUSES,
+  GENDER,
+} from '../constants/const.js';
 
 const objectValidator = (value, helpers) => {
-    if (!mongoose.Types.ObjectId.isValid(value)) {
-      return helpers.error('any.invalid');
-    }
-    return value;
+  if (!mongoose.Types.ObjectId.isValid(value)) {
+    return helpers.error('any.invalid');
+  }
+  return value;
 };
 
 export const orderIdSchema = {
@@ -18,18 +23,15 @@ export const orderIdSchema = {
 
 export const createOrderSchema = {
   [Segments.BODY]: Joi.object({
-    userId: Joi.string().custom(objectValidator).required(),
     orderNumber: Joi.string().optional(),
     items: Joi.array()
       .items(
         Joi.object({
-          goodId: Joi.string()
-            .custom(objectValidator)
-            .required(),
+          goodId: Joi.string().custom(objectValidator).required(),
           quantity: Joi.number().integer().min(1).required(),
           size: Joi.string().valid(...SIZES).optional(),
           gender: Joi.string().valid(...GENDER).optional(),
-        })
+        }),
       )
       .required(),
     deliveryCost: Joi.object({
@@ -40,8 +42,10 @@ export const createOrderSchema = {
       value: Joi.number().required(),
       currency: Joi.string().valid(...CURRENCIES).default('грн'),
     }).required(),
-    status: Joi.string().valid(...ORDER_STATUSES).required().default('Pending'),
+    status: Joi.string().valid(...ORDER_STATUSES).default('Pending'),
     shippingAddress: Joi.string().required(),
+    contactPhone: Joi.string().required(),
+    comment: Joi.string().optional(),
   }),
 };
 
@@ -50,7 +54,9 @@ export const updateOrderStatusSchema = {
     orderId: Joi.string().custom(objectValidator).required(),
   }),
   [Segments.BODY]: Joi.object({
-    status: Joi.string().valid(...ORDER_STATUSES).required(),
+    status: Joi.string()
+      .valid(...ORDER_STATUSES)
+      .required(),
   }),
 };
 

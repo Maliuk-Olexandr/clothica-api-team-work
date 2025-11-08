@@ -5,7 +5,7 @@ import { GENDER, SIZES } from '../constants/const.js';
 const orderSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    orderNumber: { type: String, required: false, unique: true, trim: true },
+    orderNumber: { type: String, required: false, trim: true },
     items: [
       {
         goodId: { type: Schema.Types.ObjectId, ref: 'Good', required: true },
