@@ -1,11 +1,26 @@
 import { Joi, Segments } from 'celebrate';
 import { isValidObjectId } from 'mongoose';
 
+const CATOGORIES = [
+  'all',
+  '690c9ce6a6276289c98fc006',
+  '690c9ce6a6276289c98fc007',
+  '690c9ce6a6276289c98fc008',
+  '690c9ce6a6276289c98fc009',
+  '690c9ce6a6276289c98fc00a',
+  '690c9ce6a6276289c98fc00b',
+  '690c9ce6a6276289c98fc00c',
+  '690c9ce6a6276289c98fc00d',
+];
+
 import { GENDER, SIZES } from '../constants/const.js';
 export const getAllGoodsSchema = {
   [Segments.QUERY]: Joi.object({
     page: Joi.number().integer().min(1).default(1),
     perPage: Joi.number().integer().min(5).max(20).default(12),
+    category: Joi.string()
+      .valid(...CATOGORIES)
+      .default('all'),
     size: Joi.string()
       .valid(...SIZES)
       .optional(),
