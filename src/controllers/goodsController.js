@@ -8,6 +8,7 @@ export const getAllGoods = async (req, res) => {
   const {
     page = 1,
     perPage = 10,
+    category,
     size,
     gender,
     minPrice,
@@ -19,6 +20,10 @@ export const getAllGoods = async (req, res) => {
   const skip = (page - 1) * perPage;
 
   const goodsQuery = Good.find();
+
+  if (category && category !== 'all') {
+    goodsQuery.where('category').equals(category);
+  }
 
   if (size) {
     goodsQuery.where('size').equals(size);
@@ -55,6 +60,8 @@ export const getAllGoods = async (req, res) => {
     perPage,
     totalGoods,
     totalPages,
+    category,
+    size,
     minPrice,
     maxPrice,
     sortBy,
