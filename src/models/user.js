@@ -24,7 +24,6 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: false,
-      unique: true,
       trim: true,
       lowercase: true,
     },
@@ -57,15 +56,17 @@ const userSchema = new Schema(
       required: false,
       trim: true,
     },
-    order: {
-      type: Schema.Types.ObjectId,
-      ref: 'Order',
-      required: false,
-    },
-    comments: [
+    orders: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'Comment',
+        ref: 'Order',
+        required: false,
+      },
+    ],
+    feedbacks: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Feedback',
         required: false,
       },
     ],

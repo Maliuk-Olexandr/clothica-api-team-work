@@ -15,7 +15,6 @@ router.use(authenticate);
 
 // router.patch(
 //   '/users/me/avatar',
-//   authenticate,
 //   upload.single('avatar'),
 //   updateUserAvatar,
 // );

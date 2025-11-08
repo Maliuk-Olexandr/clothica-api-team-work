@@ -18,17 +18,25 @@ import { User } from '../models/user.js';
 // };
 
 export async function getCurrentUser(req, res, next) {
-  const user = await User.findById(req.user._id);
-  if (!user) return next(createHttpError(404, 'User not found'));
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return next(createHttpError(404, 'User not found'));
 
-  res.status(200).json(user);
+    res.status(200).json(user);
+  } catch (error) {
+    next(error);
+  }
 }
 
 export async function updateUser(req, res, next) {
-  const user = await User.findOneAndUpdate({ _id: req.user._id }, req.body, {
-    new: true,
-  });
-  if (!user) return next(createHttpError(404, 'User not found'));
+  try {
+    const user = await User.findOneAndUpdate({ _id: req.user._id }, req.body, {
+      new: true,
+    });
+    if (!user) return next(createHttpError(404, 'User not found'));
 
-  res.status(200).json(user);
+    res.status(200).json(user);
+  } catch (error) {
+    next(error);
+  }
 }
