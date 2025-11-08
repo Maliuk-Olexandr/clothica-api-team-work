@@ -24,6 +24,8 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: false,
+      unique: false,
+      sparse: true,
       trim: true,
       lowercase: true,
     },

@@ -19,27 +19,27 @@ import {
 const router = Router();
 
 // 🔹 Реєстрація користувача (по телефону)
-router.post('/auth/register', celebrate(registerUserSchema), registerUser);
+router.post('/api/auth/register', celebrate(registerUserSchema), registerUser);
 
 // 🔹 Логін користувача (по телефону)
-router.post('/auth/login', celebrate(loginUserSchema), loginUser);
+router.post('/api/auth/login', celebrate(loginUserSchema), loginUser);
 
 // 🔹 Вихід користувача
-router.post('/auth/logout', logoutUser);
+router.post('/api/auth/logout', logoutUser);
 
 // 🔹 Оновлення сесії
-router.post('/auth/refresh', refreshUserSession);
+router.post('/api/auth/refresh', refreshUserSession);
 
 // 🔹 Запит на скидання паролю через телефон (SMS)
 router.post(
-  '/auth/request-reset-phone',
+  '/api/auth/request-reset-phone',
   celebrate(requestResetPhoneSchema),
   requestResetPhone,
 );
 
 // 🔹 Скидання паролю
 router.post(
-  '/auth/reset-password',
+  '/api/auth/reset-password',
   celebrate(resetPasswordSchema),
   resetPassword,
 );

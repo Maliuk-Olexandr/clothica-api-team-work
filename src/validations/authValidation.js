@@ -1,7 +1,6 @@
 import { Joi, Segments } from 'celebrate';
 
-// E.164 international phone format, e.g. +380501234567
-const phoneRegex = /^\+380\d{9}$/;
+import { PHONE_REGEX } from '../constants/const.js';
 
 export const registerUserSchema = {
   [Segments.BODY]: Joi.object({
@@ -11,7 +10,7 @@ export const registerUserSchema = {
       'any.required': 'Username is required',
     }),
 
-    phone: Joi.string().pattern(phoneRegex).required().messages({
+    phone: Joi.string().pattern(PHONE_REGEX).required().messages({
       'string.pattern.base':
         'Invalid phone number format. Use format +380501234567',
       'string.empty': 'Phone number is required',
@@ -29,7 +28,7 @@ export const registerUserSchema = {
 
 export const loginUserSchema = {
   [Segments.BODY]: Joi.object({
-    phone: Joi.string().pattern(phoneRegex).required().messages({
+    phone: Joi.string().pattern(PHONE_REGEX).required().messages({
       'string.pattern.base':
         'Invalid phone number format. Use format +380501234567',
       'string.empty': 'Phone number is required',
@@ -47,7 +46,7 @@ export const loginUserSchema = {
 
 export const requestResetPhoneSchema = {
   [Segments.BODY]: Joi.object({
-    phone: Joi.string().pattern(phoneRegex).required().messages({
+    phone: Joi.string().pattern(PHONE_REGEX).required().messages({
       'string.pattern.base':
         'Invalid phone number format. Use format +380501234567',
       'string.empty': 'Phone number is required',

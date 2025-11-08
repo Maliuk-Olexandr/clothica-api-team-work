@@ -8,6 +8,7 @@ import { User } from '../models/user.js';
 
 // 📱 Register a new user
 export const registerUser = async (req, res, next) => {
+  try {
   const { phone, password, username } = req.body;
 
   const existingUser = await User.findOne({ phone });
@@ -35,6 +36,9 @@ export const registerUser = async (req, res, next) => {
       username: newUser.username,
     },
   });
+} catch (error) {
+  next(error);
+}
 };
 
 // 🔑 User login
