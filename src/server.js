@@ -12,8 +12,10 @@ import { errorHandler } from './middleware/errorHandler.js';
 // import notesRoutes from './routes/notesRoutes.js';
 // import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import feedbackRoutes from './routes/feedbackRoutes.js';
 import categoriesRoutes from './routes/categoriesRoutes.js';
 import goodsRoutes from './routes/goodsRoutes.js';
+
 
 const app = express();
 const PORT = process.env.PORT || 3030;
@@ -31,6 +33,7 @@ app.use(goodsRoutes);
 // app.use(authRoutes);
 // app.use(notesRoutes);
 app.use(userRoutes);
+app.use(feedbackRoutes);
 
 
 app.use(notFoundHandler);
