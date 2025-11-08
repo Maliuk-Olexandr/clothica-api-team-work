@@ -1,8 +1,7 @@
 // routes/feedbackRoutes.js
 
 import { Router } from 'express';
-import { celebrate, Segments } from 'celebrate';
-
+import { celebrate } from 'celebrate';
 
 import {
   createFeedback,
@@ -13,16 +12,10 @@ import { feedbackValidationSchema } from '../validations/feedbackValidation.js';
 
 const router = Router();
 
-router.get('/', getFeedbacks);
-
+router.get('/api/feedbacks', getFeedbacks);
 
 router.use(authenticate);
 
-router.post(
-  '/',
-  celebrate({ [Segments.BODY]: feedbackValidationSchema }),
-  createFeedback,
-);
-
+router.post('/api/feedbacks', celebrate(feedbackValidationSchema), createFeedback);
 
 export default router;

@@ -25,7 +25,7 @@ app.use(logger);
 app.use(authRoutes);
 app.use(notesRoutes);
 app.use(userRoutes);
-app.use('/api/feedbacks', feedbackRoutes);
+app.use(feedbackRoutes);
 
 app.use(notFoundHandler);
 app.use(errors());
