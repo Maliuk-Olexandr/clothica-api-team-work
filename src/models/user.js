@@ -8,8 +8,9 @@ const userSchema = new Schema(
       type: String,
       trim: true,
       required: true,
+      maxlength: 32,
     },
-    userSername: {
+    userSurname: {
       type: String,
       trim: true,
       required: false,
@@ -19,12 +20,10 @@ const userSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-      lowercase: true,
     },
     email: {
       type: String,
       required: false,
-      unique: true,
       trim: true,
       lowercase: true,
     },
@@ -32,6 +31,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       minlength: 8,
+      maxlength: 128,
     },
     avatar: {
       type: String,
@@ -56,28 +56,23 @@ const userSchema = new Schema(
       required: false,
       trim: true,
     },
-    order: {
-      type: Schema.Types.ObjectId,
-      ref: 'Order',
-      required: false,
-    },
-    comments: [
+    orders: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'Comment',
+        ref: 'Order',
+        required: false,
+      },
+    ],
+    feedbacks: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Feedback',
         required: false,
       },
     ],
   },
   { timestamps: true, versionKey: false },
 );
-
-userSchema.pre('save', function (next) {
-  if (!this.username) {
-    this.username = this.email;
-  }
-  next();
-});
 
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();

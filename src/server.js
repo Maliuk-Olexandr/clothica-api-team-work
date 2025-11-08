@@ -9,10 +9,13 @@ import { connectMongoDB } from './db/connectMongoDB.js';
 import { logger } from './middleware/logger.js';
 import { notFoundHandler } from './middleware/notFoundHandler.js';
 import { errorHandler } from './middleware/errorHandler.js';
-import notesRoutes from './routes/notesRoutes.js';
-import authRoutes from './routes/authRoutes.js';
+// import notesRoutes from './routes/notesRoutes.js';
+// import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import feedbackRoutes from './routes/feedbackRoutes.js';
+import categoriesRoutes from './routes/categoriesRoutes.js';
+import goodsRoutes from './routes/goodsRoutes.js';
+
 
 const app = express();
 const PORT = process.env.PORT || 3030;
@@ -22,10 +25,16 @@ app.use(cookieParser());
 app.use(helmet());
 app.use(logger);
 
-app.use(authRoutes);
-app.use(notesRoutes);
+// public routes
+app.use(categoriesRoutes);
+app.use(goodsRoutes);
+
+// protected routes
+// app.use(authRoutes);
+// app.use(notesRoutes);
 app.use(userRoutes);
 app.use(feedbackRoutes);
+
 
 app.use(notFoundHandler);
 app.use(errors());

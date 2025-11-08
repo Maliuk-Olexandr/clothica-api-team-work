@@ -1,0 +1,15 @@
+import { Router } from 'express';
+import { celebrate } from 'celebrate';
+
+import {
+  getAllGoodsSchema,
+  goodIdSchema,
+} from '../validations/goodsValidation.js';
+import { getAllGoods, getGoodById } from '../controllers/goodsController.js';
+
+const router = Router();
+
+router.get('/api/goods', celebrate(getAllGoodsSchema), getAllGoods);
+router.get('/api/goods/:goodId', celebrate(goodIdSchema), getGoodById);
+
+export default router;
