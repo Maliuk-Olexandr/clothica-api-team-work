@@ -28,13 +28,12 @@ app.use(logger);
 // public routes
 app.use(categoriesRoutes);
 app.use(goodsRoutes);
+app.use(feedbackRoutes);
 
 // protected routes
 // app.use(authRoutes);
 // app.use(notesRoutes);
 app.use(userRoutes);
-app.use(feedbackRoutes);
-
 
 app.use(notFoundHandler);
 app.use(errors());
