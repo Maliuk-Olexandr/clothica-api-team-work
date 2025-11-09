@@ -17,6 +17,7 @@ import goodsRoutes from './routes/goodsRoutes.js';
 import feedbackRoutes from './routes/feedbackRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import subscriptionsRoutes from './routes/subscriptionsRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,7 +34,7 @@ app.get('/', (req, res) => res.redirect('/api-docs'));
 app.use(categoriesRoutes);
 app.use(goodsRoutes);
 app.use(feedbackRoutes);
-// app.use(subscriptionsRoutes); //in progress
+app.use(subscriptionsRoutes);
 
 // protected routes
 app.use(authRoutes);
