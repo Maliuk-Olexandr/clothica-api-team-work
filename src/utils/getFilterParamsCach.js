@@ -5,33 +5,54 @@ import Category from '../models/category.js';
 import Good from '../models/good.js';
 import { CACHE_TTL } from '../constants/time.js';
 
+let cachedMetaMemory = null; // fallback кеш в пам’яті
+let lastFetchTime = 0;
+
+let redisClient;
+let redisConnected = false;
 
 // Ініціалізуємо Redis клієнт
-const redisClient = createClient({
-  url: process.env.REDIS_URL || 'redis://localhost:6379',
-});
-redisClient.on('error', (err) => console.error('Redis error:', err));
-await redisClient.connect();
+try {
+  redisClient = createClient({
+    url: process.env.REDIS_URL || 'redis://127.0.0.1:6379',
+  });
+  redisClient.on('error', (err) => {
+    console.error('Redis connection lost', err.message);
+    redisConnected = false;
+  });
+
+  await redisClient.connect();
+  redisConnected = true;
+  console.log('Redis connected ✅');
+} catch (error) {
+  console.error('Redis init error, fallback to memory cache:', error.message);
+}
 // Ключ для збереження кешу в Redis
 const CACHE_KEY = 'filterParamsCache';
-//
+
+// Основна функція отримання кешованих параметрів фільтрів
 export const getFilterParamsCache = async () => {
   const now = Date.now();
-  // Перевіряємо кеш у Redis
-  const cachedData = await redisClient.get(CACHE_KEY);
-  // Якщо кеш існує і не прострочений, повертаємо його
-  if (cachedData) {
-    const parsedData = JSON.parse(cachedData);
-    const { timestamp, data } = parsedData;
-    if (now - timestamp < CACHE_TTL) {
-      return data;
+
+  // спроба отримати кеш з Redis
+  if (redisConnected) {
+    try {
+      const cachedData = await redisClient.get(CACHE_KEY);
+      if (cachedData) return JSON.parse(cachedData);
+    } catch (error) {
+      console.error('Error fetching from Redis:', error);
     }
   }
+  // fallback: перевірка кешу в пам’яті
+  if (cachedMetaMemory && now - lastFetchTime < CACHE_TTL) {
+    return cachedMetaMemory;
+  }
+
   // Інакше — оновлюємо з бази
   const categories = await Category.find({}, '_id').lean().exec();
   const categoryIds = ['all', ...categories.map((c) => c._id.toString())];
 
-  const priceStats = await Good.aggregate([
+  const [priceStats] = await Good.aggregate([
     {
       $group: {
         _id: null,
@@ -40,14 +61,27 @@ export const getFilterParamsCache = async () => {
       },
     },
   ]);
-  const { minPrice = 0, maxPrice = 0 } = priceStats[0] || {};
   const meta = {
     categoryIds,
-    minPrice,
-    maxPrice,
+    minPrice: priceStats?.minPrice ?? 0,
+    maxPrice: priceStats?.maxPrice ?? 0,
   };
-  // Зберігаємо оновлений кеш у Redis
-  await redisClient.setEx(CACHE_KEY, CACHE_TTL / 1000, JSON.stringify(meta));
+  //  Оновлення Redis кешу
+  if (redisConnected) {
+    try {
+      await redisClient.setEx(
+        CACHE_KEY,
+        CACHE_TTL / 1000,
+        JSON.stringify(meta),
+      );
+    } catch (error) {
+      console.error('Error saving to Redis:', error);
+    }
+  }
+  // Оновлення локального кешу в пам’яті
+  cachedMetaMemory = meta;
+  lastFetchTime = now;
+
   return meta;
 };
 
