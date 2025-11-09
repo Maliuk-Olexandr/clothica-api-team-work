@@ -26,7 +26,8 @@ app.use(cookieParser());
 app.use(helmet());
 app.use(logger);
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));// app.get('/', (req, res) => res.redirect('/api-docs'));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get('/', (req, res) => res.redirect('/api-docs'));
 
 // public routes
 app.use(categoriesRoutes);
