@@ -10,14 +10,14 @@ import { logger } from './middleware/logger.js';
 import { notFoundHandler } from './middleware/notFoundHandler.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
-import userRoutes from './routes/userRoutes.js';
-import feedbackRoutes from './routes/feedbackRoutes.js';
 import categoriesRoutes from './routes/categoriesRoutes.js';
 import goodsRoutes from './routes/goodsRoutes.js';
-
+import feedbackRoutes from './routes/feedbackRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 const app = express();
-const PORT = process.env.PORT || 3030;
+const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
@@ -28,9 +28,11 @@ app.use(logger);
 app.use(categoriesRoutes);
 app.use(goodsRoutes);
 app.use(feedbackRoutes);
+// app.use(subscriptionsRoutes); //in progress
 
 // protected routes
 app.use(authRoutes);
+app.use(orderRoutes);
 app.use(userRoutes);
 
 app.use(notFoundHandler);

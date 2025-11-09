@@ -1,23 +1,11 @@
-import mongoose from 'mongoose';
 import { Joi, Segments } from 'celebrate';
 
-import {
-  SIZES,
-  CURRENCIES,
-  ORDER_STATUSES,
-  GENDER,
-} from '../constants/const.js';
+import {SIZES,CURRENCIES,ORDER_STATUSES,GENDER,} from '../constants/const.js';
+import { objectIdValidator } from '../utils/objectIdValidator.js';
 
-const objectValidator = (value, helpers) => {
-  if (!mongoose.Types.ObjectId.isValid(value)) {
-    return helpers.error('any.invalid');
-  }
-  return value;
-};
-
-export const orderIdSchema = {
+export const getOrderByIdSchema = {
   [Segments.PARAMS]: Joi.object({
-    orderId: Joi.string().custom(objectValidator).required(),
+    orderId: Joi.string().custom(objectIdValidator).required(),
   }),
 };
 
@@ -27,7 +15,7 @@ export const createOrderSchema = {
     items: Joi.array()
       .items(
         Joi.object({
-          goodId: Joi.string().custom(objectValidator).required(),
+          goodId: Joi.string().custom(objectIdValidator).required(),
           quantity: Joi.number().integer().min(1).required(),
           size: Joi.string().valid(...SIZES).optional(),
           gender: Joi.string().valid(...GENDER).optional(),
@@ -51,7 +39,7 @@ export const createOrderSchema = {
 
 export const updateOrderStatusSchema = {
   [Segments.PARAMS]: Joi.object({
-    orderId: Joi.string().custom(objectValidator).required(),
+    orderId: Joi.string().custom(objectIdValidator).required(),
   }),
   [Segments.BODY]: Joi.object({
     status: Joi.string()
@@ -67,6 +55,6 @@ export const getAllOrdersSchema = {
     status: Joi.string()
       .valid(...ORDER_STATUSES)
       .optional(),
-    userId: Joi.string().custom(objectValidator).optional(),
+    userId: Joi.string().custom(objectIdValidator).optional(),
   }),
 };

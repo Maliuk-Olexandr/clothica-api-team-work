@@ -21,7 +21,7 @@ export const getAllGoods = async (req, res, next) => {
   if (gender && gender !== 'all') {goodsQuery.where('gender').equals(gender);}
 
   // Виконуємо одразу два запити паралельно
-  const [goods, totalGoods] = await Promise.all([
+  const [totalGoods, goods] = await Promise.all([
     goodsQuery.clone().countDocuments(),
     goodsQuery
       .skip(skip)

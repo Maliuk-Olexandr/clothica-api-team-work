@@ -24,13 +24,18 @@ const orderSchema = new Schema(
       },
     ],
     deliveryCost: {
+      type: {
+        value: { type: Number, required: true },
+        currency: { type: String, required: true, default: 'грн' },
+      },
       required: false,
-      value: { type: Number, required: true },
-      currency: { type: String, required: true, default: 'грн' },
     },
     totalPrice: {
-      value: { type: Number, required: true },
-      currency: { type: String, required: true, default: 'грн' },
+      type: {
+        value: { type: Number, required: true },
+        currency: { type: String, required: true, default: 'грн' },
+      },
+      required: true,
     },
     status: {
       type: String,
