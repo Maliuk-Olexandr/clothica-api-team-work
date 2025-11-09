@@ -6,16 +6,16 @@ const options = {
     info: {
       title: 'Clothica API',
       version: '1.0.0',
-      description: 'API документація для Clothica (оновлена під OpenAPI 3.1)',
+      description: 'API документація для Clothica',
       contact: {
         name: 'Clothica API Team',
-        email: 'support@clothica.com',
+        email: 'maliukolexandr@gmail.com',
       },
     },
     servers: [
       {
-        url: 'http://localhost:3000',
-        description: 'Local server',
+        url: 'https://clothica-api-team-work.onrender.com',
+        description: 'Production server',
       },
     ],
     components: {
