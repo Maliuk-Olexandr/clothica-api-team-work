@@ -107,8 +107,7 @@ export const refreshUserSession = async (req, res, next) => {
       return next(createHttpError(401, 'Session token expired'));
     }
 
-    await Session.deleteMany({
-      //delateOne -> deleteMany
+    await Session.deleteOne({
       _id: session._id,
       refreshToken: req.cookies.refreshToken,
     });
@@ -142,7 +141,9 @@ export const requestResetPhone = async (req, res, next) => {
     );
 
     // TODO: 🔧 Integrate with SMS API (e.g., Twilio)
-    console.log(`🔐 SMS reset token for ${phone}: ${resetToken}`);
+    if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+      console.log(`🔐 SMS reset token for ${phone}: ${resetToken}`);
+    }
 
     res.status(200).json({
       message: 'Password reset SMS sent successfully',
