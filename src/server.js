@@ -18,6 +18,7 @@ import feedbackRoutes from './routes/feedbackRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import subscriptionsRoutes from './routes/subscriptionsRoutes.js';
+import filterRoutes from './routes/filterRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -35,6 +36,7 @@ app.use(categoriesRoutes);
 app.use(goodsRoutes);
 app.use(feedbackRoutes);
 app.use(subscriptionsRoutes);
+app.use(filterRoutes);
 
 // protected routes
 app.use(authRoutes);

@@ -3,6 +3,7 @@ import { createClient } from 'redis';
 
 import Category from '../models/category.js';
 import Good from '../models/good.js';
+// import Filter from '../models/filters.js';
 import { CACHE_TTL } from '../constants/time.js';
 
 let cachedMetaMemory = null; // fallback кеш в пам’яті
@@ -38,7 +39,7 @@ async function initRedis() {
               () => {
                 redisReconnectedPause = false;
                 console.log('Resuming Redis reconnection attempts.');
-                initRedis(); // Спроба повторного підключення
+                initRedis().catch((err) => console.error('Error during Redis reconnection:', err)); // Спроба повторного підключення
               },
               5 * 60 * 1000, // пауза 5 хвилин
             );
@@ -89,7 +90,7 @@ async function initRedis() {
 }
 
 // Ініціалізуємо Redis клієнт
-initRedis();
+await initRedis();
 
 // Основна функція отримання кешованих параметрів фільтрів
 export const getFilterParamsCache = async () => {
@@ -113,8 +114,7 @@ export const getFilterParamsCache = async () => {
   }
 
   // Інакше — оновлюємо з бази
-  const categories = await Category.find({}, '_id').lean().exec();
-  const categoryIds = ['all', ...categories.map((c) => c._id.toString())];
+  const categories = await Category.find({}, '_id name').lean().exec();
 
   const [priceStats] = await Good.aggregate([
     {
@@ -127,7 +127,7 @@ export const getFilterParamsCache = async () => {
   ]);
 
   const meta = {
-    categoryIds,
+    categories: [{ _id: 'all', name: 'Усі' }, ...categories],
     minPrice: priceStats?.minPrice ?? 0,
     maxPrice: priceStats?.maxPrice ?? 0,
   };
