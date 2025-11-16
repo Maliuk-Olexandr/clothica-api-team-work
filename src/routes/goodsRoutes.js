@@ -53,14 +53,14 @@ export default router;
  *         name: size
  *         schema:
  *           type: string
- *           enum: [SIZES тут підставити]
+ *           enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
  *         description: Розмір товару
  *       - in: query
  *         name: gender
  *         schema:
  *           type: string
- *           enum: [GENDER тут підставити]
- *           default: "чоловіки"
+ *           enum: ['all', 'man', 'women', 'unisex']
+ *           default: "man"
  *         description: Стать для товару
  *       - in: query
  *         name: minPrice
