@@ -1,6 +1,7 @@
 import createHttpError from 'http-errors';
 
 import Feedback from '../models/feedback.js';
+import User from '../models/user.js';
 
 // 1. Публічний: СТВОРЕННЯ відгуку (POST /api/feedbacks)
 export const createFeedback = async (req, res, next) => {
@@ -14,6 +15,10 @@ export const createFeedback = async (req, res, next) => {
       date: date || Date.now(),
       userId: req.user ? req.user._id : null,
     });
+    if (newFeedback.userId)
+      await User.findByIdAndUpdate(newFeedback.userId, {
+        $push: { feedbacks: newFeedback._id },
+      });
     res.status(201).json(newFeedback);
   } catch (error) {
     if (error.name === 'ValidationError') {
