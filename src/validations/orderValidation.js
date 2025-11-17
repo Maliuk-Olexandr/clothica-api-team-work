@@ -24,7 +24,7 @@ export const createOrderSchema = {
       )
       .required(),
     deliveryCost: Joi.object({
-      value: Joi.number().required(),
+      value: Joi.number().optional().allow(null),
       currency: Joi.string().valid(...CURRENCIES).default('грн'),
     }),
     totalPrice: Joi.object({
