@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 
-import { GENDER, SIZES } from '../constants/const.js';
+import { GENDERS, SIZES } from '../constants/const.js';
 
 const orderSchema = new Schema(
   {
@@ -17,7 +17,7 @@ const orderSchema = new Schema(
         name: { type: String, required: true, trim: true },
         quantity: { type: Number, required: true, min: 1 },
         size: { type: String, enum: SIZES, required: false },
-        gender: { type: String, enum: GENDER, required: false, trim: true },
+        gender: { type: String, enum: GENDERS, required: false, trim: true },
         price: { type: Number, required: true },
       },
     ],

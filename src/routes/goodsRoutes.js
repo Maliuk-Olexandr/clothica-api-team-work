@@ -59,8 +59,8 @@ export default router;
  *         name: gender
  *         schema:
  *           type: string
- *           enum: ['all', 'man', 'women', 'unisex']
- *           default: "man"
+ *           enum: ['all', 'women', 'men', 'unisex']
+ *           default: "men"
  *         description: Стать для товару
  *       - in: query
  *         name: minPrice

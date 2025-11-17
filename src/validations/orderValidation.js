@@ -4,7 +4,7 @@ import {
   SIZES,
   CURRENCIES,
   ORDER_STATUSES,
-  GENDER,
+  GENDERS,
 } from '../constants/const.js';
 import { objectIdValidator } from '../utils/objectIdValidator.js';
 
@@ -30,7 +30,7 @@ export const createOrderSchema = {
             .valid(...SIZES)
             .optional(),
           gender: Joi.string()
-            .valid(...GENDER)
+            .valid(...GENDERS)
             .optional(),
           price: Joi.number().required(),
         }),

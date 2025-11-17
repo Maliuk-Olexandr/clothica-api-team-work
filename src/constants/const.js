@@ -1,9 +1,9 @@
-export const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-export const GENDER = ['all', 'man', 'women', 'unisex'];
+export const SIZES = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL'];
+export const GENDERS = ['all', 'women', 'men', 'unisex'];
 
 export const CURRENCIES = ['грн', 'usd', 'eur'];
 
-export const ROLE = ['User', 'Admin'];
+export const ROLES = ['User', 'Admin'];
 
 export const ORDER_STATUSES = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 

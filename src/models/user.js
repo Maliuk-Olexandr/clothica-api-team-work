@@ -1,6 +1,6 @@
 import { model, Schema } from 'mongoose';
 
-import { ROLE } from '../constants/const.js';
+import { ROLES } from '../constants/const.js';
 
 const userSchema = new Schema(
   {
@@ -45,7 +45,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      enum: ROLE,
+      enum: ROLES,
       default: 'User',
     },
     city: {

@@ -1,7 +1,7 @@
 import { Joi, Segments } from 'celebrate';
 
 import { objectIdValidator } from '../utils/objectIdValidator.js';
-import { GENDER, SIZES } from '../constants/const.js';
+import { GENDERS, SIZES } from '../constants/const.js';
 
 export const getAllGoodsSchema = {
   [Segments.QUERY]: Joi.object({
@@ -28,8 +28,8 @@ export const getAllGoodsSchema = {
       'number.integer': 'maxPrice must be an integer',
       'number.min': 'maxPrice >= 0',
     }),
-    gender: Joi.string().valid(...GENDER).default(GENDER[0]).messages({
-        'any.only': `Gender must be one of the following: ${GENDER.join(', ')}`,
+    gender: Joi.string().valid(...GENDERS).default(GENDERS[0]).messages({
+        'any.only': `Gender must be one of the following: ${GENDERS.join(', ')}`,
       }),
     sortBy: Joi.string().valid('_id', 'price.value').default('_id'),
     sortOrder: Joi.string().valid('asc', 'desc').default('asc'),
