@@ -11,6 +11,7 @@ export const getOrderByIdSchema = {
 
 export const createOrderSchema = {
   [Segments.BODY]: Joi.object({
+    userId: Joi.string().custom(objectIdValidator).optional().allow(null),
     orderNumber: Joi.string().optional(),
     items: Joi.array()
       .items(
