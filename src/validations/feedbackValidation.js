@@ -13,9 +13,9 @@ export const feedbackValidationSchema = {
       'any.required': 'Rate is required',
     }),
 
-    description: Joi.string().min(10).max(500).required().messages({
+    description: Joi.string().min(5).max(500).required().messages({
       'any.required': 'Description text is required',
-      'string.min': 'Description should have a minimum length of 10',
+      'string.min': 'Description should have a minimum length of 5',
     }),
 
     author: Joi.string()

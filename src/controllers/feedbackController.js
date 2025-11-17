@@ -1,8 +1,8 @@
 import createHttpError from 'http-errors';
 
 import Feedback from '../models/feedback.js';
+import Good from '../models/good.js';
 import User from '../models/user.js';
-
 // 1. Публічний: СТВОРЕННЯ відгуку (POST /api/feedbacks)
 export const createFeedback = async (req, res, next) => {
   try {
@@ -15,10 +15,19 @@ export const createFeedback = async (req, res, next) => {
       date: date || Date.now(),
       userId: req.user ? req.user._id : null,
     });
+    if (newFeedback.productId)
+      await Good.findByIdAndUpdate(newFeedback.productId, {
+        $push: { feedbacks: newFeedback._id },
+      });
     if (newFeedback.userId)
       await User.findByIdAndUpdate(newFeedback.userId, {
         $push: { feedbacks: newFeedback._id },
       });
+    if (newFeedback.userId)
+      await Good.findByIdAndUpdate(newFeedback.productId, {
+        $push: { orders: newFeedback._id },
+      });
+
     res.status(201).json(newFeedback);
   } catch (error) {
     if (error.name === 'ValidationError') {
@@ -52,16 +61,14 @@ export const getFeedbacks = async (req, res, next) => {
     ]);
     // calculate total pages
     const totalPages = Math.ceil(totalFeedbacks / perPage);
-    res
-      .status(200)
-      .json({
-        page,
-        perPage,
-        totalPages,
-        productId,
-        totalFeedbacks,
-        feedbacks,
-      });
+    res.status(200).json({
+      page,
+      perPage,
+      totalPages,
+      productId,
+      totalFeedbacks,
+      feedbacks,
+    });
   } catch (error) {
     next(error);
   }
