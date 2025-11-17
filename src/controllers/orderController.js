@@ -1,6 +1,7 @@
 import createHttpError from 'http-errors';
 
 import Order from '../models/order.js';
+import User from '../models/user.js';
 
 /**
  * GET /api/orders
@@ -57,6 +58,8 @@ export const getOrderById = async (req, res, next) => {
 export const createOrder = async (req, res, next) => {
   try {
     const order = await Order.create({ ...req.body, userId: req.body.userId || null });
+    if (order.userId)
+  await User.findByIdAndUpdate(order.userId, { $push: { orders: order._id } });
     res.status(201).json(order);
   } catch (error) {
     next(error);

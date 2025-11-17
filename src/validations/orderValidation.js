@@ -17,7 +17,10 @@ export const getOrderByIdSchema = {
 export const createOrderSchema = {
   [Segments.BODY]: Joi.object({
     userId: Joi.string().custom(objectIdValidator).optional().allow(null),
-    orderNumber: Joi.string().optional(),
+    userName: Joi.string().required(),
+    userSurname: Joi.string().required(),
+    userEmail: Joi.string().email().optional().allow(null, ''),
+    orderNumber: Joi.string().optional().allow(null, ''),
 
     items: Joi.array()
       .items(
@@ -60,7 +63,7 @@ export const createOrderSchema = {
     }).required(),
 
     contactPhone: Joi.string().required(),
-    comment: Joi.string().optional(),
+    comment: Joi.string().optional().allow(null, ''),
   }),
 };
 

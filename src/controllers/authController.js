@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 
 import { createSession, setSessionCookies } from '../services/auth.js';
 import { Session } from '../models/session.js';
-import { User } from '../models/user.js';
+import User from '../models/user.js';
 
 // 📱 Register a new user
 export const registerUser = async (req, res, next) => {
