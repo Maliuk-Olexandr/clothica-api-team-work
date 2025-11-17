@@ -56,7 +56,7 @@ export const getOrderById = async (req, res, next) => {
  */
 export const createOrder = async (req, res, next) => {
   try {
-    const order = await Order.create({ ...req.body, userId: req.user._id });
+    const order = await Order.create({ ...req.body, userId: req.body.userId || null });
     res.status(201).json(order);
   } catch (error) {
     next(error);
