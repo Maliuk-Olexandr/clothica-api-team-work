@@ -28,14 +28,14 @@ export default router;
  * @swagger
  * tags:
  *   name: Orders
- *   description: Роутери замовлень
+ *   description: Управління замовленнями
  */
 
 /**
  * @swagger
  * /api/orders:
  *   get:
- *     summary: Отримати всі замовлення користувача
+ *     summary: Отримати всі замовлення користувача або всі замовлення (для admin)
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
@@ -46,43 +46,42 @@ export default router;
  *         schema:
  *           type: integer
  *           default: 1
+ *         description: Номер сторінки
  *       - in: query
  *         name: perPage
  *         schema:
  *           type: integer
  *           default: 10
- *       - in: query
- *         name: status
- *         schema:
- *           type: string
- *           enum: [Pending, Processing, Completed, Cancelled]
- *       - in: query
- *         name: userId
- *         schema:
- *           type: string
+ *         description: Кількість замовлень на сторінку
  *     responses:
  *       200:
- *         description: Список замовлень
+ *         description: Список замовлень із пагінацією
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 page: { type: integer }
- *                 perPage: { type: integer }
- *                 totalOrders: { type: integer }
- *                 totalPages: { type: integer }
+ *                 page:
+ *                   type: integer
+ *                 perPage:
+ *                   type: integer
+ *                 totalOrders:
+ *                   type: integer
+ *                 totalPages:
+ *                   type: integer
  *                 orders:
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Order'
+ *       401:
+ *         description: Неавторизований доступ
  */
 
 /**
  * @swagger
  * /api/orders/{orderId}:
  *   get:
- *     summary: Отримати замовлення за ID
+ *     summary: Отримати замовлення за ID (користувач бачить тільки свої)
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
@@ -117,7 +116,7 @@ export default router;
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Order'
+ *             $ref: '#/components/schemas/OrderInput'
  *     responses:
  *       201:
  *         description: Замовлення створено
@@ -125,6 +124,8 @@ export default router;
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Order'
+ *       400:
+ *         description: Некоректні дані
  */
 
 /**
@@ -155,7 +156,7 @@ export default router;
  *                 enum: [Pending, Processing, Completed, Cancelled]
  *     responses:
  *       200:
- *         description: Статус оновлено
+ *         description: Статус замовлення змінено
  *         content:
  *           application/json:
  *             schema:
@@ -164,4 +165,143 @@ export default router;
  *         description: Доступ заборонено
  *       404:
  *         description: Замовлення не знайдено
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     OrderInput:
+ *       type: object
+ *       required:
+ *         - userName
+ *         - userSurname
+ *         - contactPhone
+ *         - items
+ *         - totalPrice
+ *         - shippingAddress
+ *       properties:
+ *         userId:
+ *           type: string
+ *           nullable: true
+ *         userName:
+ *           type: string
+ *         userSurname:
+ *           type: string
+ *         contactPhone:
+ *           type: string
+ *         userEmail:
+ *           type: string
+ *         orderNumber:
+ *           type: string
+ *         items:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               goodId:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               quantity:
+ *                 type: number
+ *               size:
+ *                 type: string
+ *               gender:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *         deliveryCost:
+ *           type: object
+ *           properties:
+ *             value:
+ *               type: number
+ *             currency:
+ *               type: string
+ *         totalPrice:
+ *           type: object
+ *           properties:
+ *             value:
+ *               type: number
+ *             currency:
+ *               type: string
+ *         status:
+ *           type: string
+ *           enum: [Pending, Processing, Completed, Cancelled]
+ *         shippingAddress:
+ *           type: object
+ *           properties:
+ *             city:
+ *               type: string
+ *             postNumber:
+ *               type: string
+ *         comment:
+ *           type: string
+ *
+ *     Order:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         userId:
+ *           type: string
+ *           nullable: true
+ *         userName:
+ *           type: string
+ *         userSurname:
+ *           type: string
+ *         contactPhone:
+ *           type: string
+ *         userEmail:
+ *           type: string
+ *         orderNumber:
+ *           type: string
+ *         items:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               goodId:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               quantity:
+ *                 type: number
+ *               size:
+ *                 type: string
+ *               gender:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *         deliveryCost:
+ *           type: object
+ *           properties:
+ *             value:
+ *               type: number
+ *             currency:
+ *               type: string
+ *         totalPrice:
+ *           type: object
+ *           properties:
+ *             value:
+ *               type: number
+ *             currency:
+ *               type: string
+ *         status:
+ *           type: string
+ *         shippingAddress:
+ *           type: object
+ *           properties:
+ *             city:
+ *               type: string
+ *             postNumber:
+ *               type: string
+ *         comment:
+ *           type: string
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
  */

@@ -97,3 +97,68 @@ export default router;
  *       500:
  *         description: Внутрішня помилка сервера
  */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     FeedbackInput:
+ *       type: object
+ *       required:
+ *         - rate
+ *         - author
+ *         - description
+ *         - productId
+ *       properties:
+ *         rate:
+ *           type: number
+ *           minimum: 1
+ *           maximum: 5
+ *         author:
+ *           type: string
+ *         description:
+ *           type: string
+ *         productId:
+ *           type: string
+ *         date:
+ *           type: string
+ *           format: date-time
+ *
+ *     Feedback:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         userId:
+ *           type: object
+ *           nullable: true
+ *           properties:
+ *             _id:
+ *               type: string
+ *             username:
+ *               type: string
+ *         author:
+ *           type: string
+ *         description:
+ *           type: string
+ *         rate:
+ *           type: number
+ *         category:
+ *           type: string
+ *         productId:
+ *           type: object
+ *           properties:
+ *             _id:
+ *               type: string
+ *             name:
+ *               type: string
+ *         date:
+ *           type: string
+ *           format: date-time
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ */

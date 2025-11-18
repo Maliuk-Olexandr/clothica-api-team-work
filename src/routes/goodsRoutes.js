@@ -48,7 +48,7 @@ export default router;
  *         schema:
  *           type: string
  *           default: all
- *         description: ID категорії
+ *         description: ID категорії або "all"
  *       - in: query
  *         name: size
  *         schema:
@@ -61,7 +61,7 @@ export default router;
  *           type: string
  *           enum: ['all', 'women', 'men', 'unisex']
  *           default: "men"
- *         description: Стать для товару
+ *         description: Стать для товарів
  *       - in: query
  *         name: minPrice
  *         schema:
@@ -76,14 +76,14 @@ export default router;
  *         name: sortBy
  *         schema:
  *           type: string
- *           enum: [_id, price.value]
- *           default: _id
+ *           enum: ['_id', 'price.value']
+ *           default: '_id'
  *       - in: query
  *         name: sortOrder
  *         schema:
  *           type: string
- *           enum: [asc, desc]
- *           default: asc
+ *           enum: ['asc', 'desc']
+ *           default: 'asc'
  *     responses:
  *       200:
  *         description: Список товарів
@@ -147,6 +147,23 @@ export default router;
  * @swagger
  * components:
  *   schemas:
+ *     Feedback:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         rate:
+ *           type: number
+ *         description:
+ *           type: string
+ *         author:
+ *           type: string
+ *         productId:
+ *           type: string
+ *         date:
+ *           type: string
+ *           format: date-time
+ *
  *     Good:
  *       type: object
  *       properties:
@@ -154,15 +171,30 @@ export default router;
  *           type: string
  *         name:
  *           type: string
+ *         image:
+ *           type: string
  *         price:
  *           type: object
  *           properties:
  *             value:
  *               type: number
+ *             currency:
+ *               type: string
  *         size:
+ *           type: array
+ *           items:
+ *             type: string
+ *         description:
+ *           type: string
+ *         prevDescription:
  *           type: string
  *         gender:
  *           type: string
+ *           enum: ['women', 'men', 'unisex']
+ *         characteristics:
+ *           type: array
+ *           items:
+ *             type: string
  *         category:
  *           type: object
  *           properties:
@@ -173,17 +205,11 @@ export default router;
  *         feedbacks:
  *           type: array
  *           items:
- *             type: object
- *             properties:
- *               rate:
- *                 type: number
- *               description:
- *                 type: string
- *               author:
- *                 type: string
- *               productId:
- *                 type: string
- *               date:
- *                 type: string
- *                 format: date-time
+ *             $ref: '#/components/schemas/Feedback'
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
  */
