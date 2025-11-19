@@ -13,10 +13,10 @@ export const getAllOrders = async (req, res, next) => {
     const perPage = Number(req.query.perPage) || 10;
     const skip = (page - 1) * perPage;
 
-    const filter = req.user.role === 'admin' ? {} : { userId: req.user._id };
+    const filter = req.user.role?.toLowerCase() === 'admin' ? {} : { userId: req.user._id };
 
     const [orders, totalOrders] = await Promise.all([
-      Order.find(filter).skip(skip).limit(perPage).exec(),
+      Order.find(filter).sort({ createdAt: -1 }).skip(skip).limit(perPage).exec(),
       Order.countDocuments(filter),
     ]);
 
@@ -68,16 +68,17 @@ export const createOrder = async (req, res, next) => {
 
 /**
  * PATCH /api/orders/:orderId/status
- * Змінити статус замовлення (тільки admin)
+ * Змінити статус замовлення (тільки Admin)
  */
 
 export const updateOrderStatus = async (req, res, next) => {
   try {
-    if (req.user.role !== 'admin') {
+    if (req.user.role !== 'Admin') {
       return next(createHttpError(403, 'Access denied'));
     }
 
     const { orderId } = req.params;
+    console.log('REQ BODY:', req.body);
     const order = await Order.findOneAndUpdate({ _id: orderId }, req.body, {
       new: true,
     });

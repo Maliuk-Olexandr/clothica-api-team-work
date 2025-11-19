@@ -131,7 +131,7 @@ export default router;
  * @swagger
  * /api/orders/{orderId}/status:
  *   patch:
- *     summary: Оновити статус замовлення (тільки admin)
+ *     summary: Оновити статус замовлення (тільки Admin)
  *     tags: [Orders]
  *     security:
  *       - bearerAuth: []

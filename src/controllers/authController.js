@@ -60,13 +60,13 @@ export const loginUser = async (req, res, next) => {
 
     const newSession = await createSession(user._id);
     setSessionCookies(res, newSession);
-
     res.status(200).json({
       message: 'Login successful',
       user: {
         id: user._id,
         username: user.username,
         phone: user.phone,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -180,3 +180,4 @@ export const resetPassword = async (req, res, next) => {
     next(error);
   }
 };
+
