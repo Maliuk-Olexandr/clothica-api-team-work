@@ -15,13 +15,22 @@ export const getAllGoodsSchema = {
       'number.integer': 'perPage must be an integer',
     }),
     category: Joi.string().default('all'),
-    size: Joi.array()
-      .items(
-        Joi.string().valid(...SIZES).messages({'any.only': `Size must be one of the following: ${SIZES.join(', ')}`,}),)
-      .optional()
-      .messages({
-        'array.base': 'Size must be an array',
-      }),
+    size: Joi.alternatives()
+      .try(
+        Joi.array().items(
+          Joi.string()
+            .valid(...SIZES)
+            .messages({
+              'any.only': `Size must be one of the following: ${SIZES.join(', ')}`,
+            }),
+        ),
+        Joi.string()
+          .valid(...SIZES)
+          .messages({
+            'any.only': `Size must be one of the following: ${SIZES.join(', ')}`,
+          }),
+      )
+      .optional(),
     minPrice: Joi.number().integer().min(0).optional().messages({
       'number.base': 'minPrice must be a number',
       'number.integer': 'minPrice must be an integer',
