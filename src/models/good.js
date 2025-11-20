@@ -26,13 +26,13 @@ const goodSchema = new Schema(
         default: 'грн',
       },
     },
-    size: [
+    size:
       {
-        type: String,
+        type: [String],
         enum: SIZES,
         required: false,
       },
-    ],
+    
     description: {
       type: String,
       required: false,

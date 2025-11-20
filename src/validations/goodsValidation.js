@@ -15,8 +15,12 @@ export const getAllGoodsSchema = {
       'number.integer': 'perPage must be an integer',
     }),
     category: Joi.string().default('all'),
-    size: Joi.string().valid(...SIZES).optional().messages({
-        'any.only': `Size must be one of the following: ${SIZES.join(', ')}`,
+    size: Joi.array()
+      .items(
+        Joi.string().valid(...SIZES).messages({'any.only': `Size must be one of the following: ${SIZES.join(', ')}`,}),)
+      .optional()
+      .messages({
+        'array.base': 'Size must be an array',
       }),
     minPrice: Joi.number().integer().min(0).optional().messages({
       'number.base': 'minPrice must be a number',
@@ -28,7 +32,10 @@ export const getAllGoodsSchema = {
       'number.integer': 'maxPrice must be an integer',
       'number.min': 'maxPrice >= 0',
     }),
-    gender: Joi.string().valid(...GENDERS).default(GENDERS[0]).messages({
+    gender: Joi.string()
+      .valid(...GENDERS)
+      .default(GENDERS[0])
+      .messages({
         'any.only': `Gender must be one of the following: ${GENDERS.join(', ')}`,
       }),
     sortBy: Joi.string().valid('_id', 'price.value').default('_id'),

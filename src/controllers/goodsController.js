@@ -31,8 +31,10 @@ export const getAllGoods = async (req, res, next) => {
       goodsQuery.where('category').equals(category);
     }
     if (size) {
-      goodsQuery.where('size').equals(size);
+      const sizesArray = Array.isArray(size) ? size : [size];
+      goodsQuery.where('size').in(sizesArray);
     }
+
     if (minPrice !== undefined) {
       goodsQuery.where('price.value').gte(minPrice);
     }
