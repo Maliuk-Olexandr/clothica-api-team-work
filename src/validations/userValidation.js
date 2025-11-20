@@ -8,6 +8,6 @@ export const updateUserSchema = {
     userSurname: Joi.string(),
     phone: Joi.string().regex(PHONE_REGEX),
     city: Joi.string(),
-    postNumber: Joi.string(),
+    postNumber: Joi.number(),
   }).min(1),
 };

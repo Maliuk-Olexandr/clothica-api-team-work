@@ -59,7 +59,7 @@ export const createOrderSchema = {
 
     shippingAddress: Joi.object({
       city: Joi.string().required(),
-      postNumber: Joi.string().required(),
+      postNumber: Joi.number().required(),
     }).required(),
 
     contactPhone: Joi.string().required(),

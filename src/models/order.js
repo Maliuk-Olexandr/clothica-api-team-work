@@ -42,7 +42,7 @@ const orderSchema = new Schema(
       type: {
         _id: false, // ← вимикаємо автоматичний _id у піддокументі
         city: { type: String, required: true, trim: true },
-        postNumber: { type: String, required: true, trim: true },
+        postNumber: { type: Number, required: true, trim: true },
       },
       required: true,
     },
