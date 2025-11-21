@@ -6,6 +6,7 @@ import {
   loginUser,
   logoutUser,
   refreshUserSession,
+  getSession,
   requestResetPhone,
   resetPassword,
 } from '../controllers/authController.js';
@@ -24,9 +25,11 @@ router.post('/api/auth/register', celebrate(registerUserSchema), registerUser);
 router.post('/api/auth/login', celebrate(loginUserSchema), loginUser);
 router.post('/api/auth/request-reset-phone', celebrate(requestResetPhoneSchema), requestResetPhone);
 router.post('/api/auth/reset-password', celebrate(resetPasswordSchema), resetPassword);
+router.get('/api/auth/session', getSession);
 //protected routes
 router.post('/api/auth/logout', authenticate, logoutUser);
 router.post('/api/auth/refresh', authenticate, refreshUserSession);
+router.post('/api/auth/session', authenticate, refreshUserSession);
 
 export default router;
 

@@ -126,6 +126,65 @@ export const refreshUserSession = async (req, res, next) => {
   }
 };
 
+// 📲 Get current user session
+export const getSession = async (req, res, next) => {
+  try {
+    const accessToken = req.cookies.accessToken;
+    const refreshToken = req.cookies.refreshToken;
+
+    // ❌ Немає жодного токена
+    if (!accessToken && !refreshToken) {
+      return next(createHttpError(401, 'No tokens provided'));
+    }
+
+    // 1️⃣ Спробуємо знайти по accessToken
+    if (accessToken) {
+      const session = await Session.findOne({ accessToken });
+
+      if (session && new Date() < new Date(session.accessTokenValidUntil)) {
+        const user = await User.findById(session.userId).select('-password');
+        return res.json({ success: true, user });
+      }
+    }
+
+    // 2️⃣ Якщо accessToken протух → пробуємо refreshToken
+    if (refreshToken) {
+      const oldSession = await Session.findOne({ refreshToken });
+
+      if (!oldSession) {
+        return next(createHttpError(401, 'Invalid refresh token'));
+      }
+
+      const refreshExpired =
+        new Date() > new Date(oldSession.refreshTokenValidUntil);
+
+      if (refreshExpired) {
+        await Session.deleteOne({ _id: oldSession._id });
+        return next(createHttpError(401, 'Refresh token expired'));
+      }
+
+      // 3️⃣ Створюємо нову сесію
+      const newSession = await createSession(oldSession.userId);
+
+      // ❗ дуже важливо — видаляємо стару
+      await Session.deleteOne({ _id: oldSession._id });
+
+      // 4️⃣ Проставляємо нові кукі
+      setSessionCookies(res, newSession);
+
+      // 5️⃣ Повертаємо юзера
+      const user = await User.findById(oldSession.userId).select('-password');
+
+      return res.json({ success: true, user, refreshed: true });
+    }
+
+    return next(createHttpError(401, 'Unauthorized'));
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 // 📱 Request password reset via phone
 export const requestResetPhone = async (req, res, next) => {
   try {
@@ -185,4 +244,3 @@ export const resetPassword = async (req, res, next) => {
     next(error);
   }
 };
-
