@@ -129,58 +129,59 @@ export const refreshUserSession = async (req, res, next) => {
 // 📲 Get current user session
 export const getSession = async (req, res, next) => {
   try {
-    const accessToken = req.cookies.accessToken;
-    const refreshToken = req.cookies.refreshToken;
+    const { accessToken, refreshToken } = req.cookies;
 
-    // ❌ Немає жодного токена
+    // ⛔ Немає жодних токенів
     if (!accessToken && !refreshToken) {
-      return next(createHttpError(401, 'No tokens provided'));
+      return res.status(200).json({ success: false });
     }
 
-    // 1️⃣ Спробуємо знайти по accessToken
+    // 1️⃣ Є accessToken → пробуємо його
     if (accessToken) {
       const session = await Session.findOne({ accessToken });
 
       if (session && new Date() < new Date(session.accessTokenValidUntil)) {
         const user = await User.findById(session.userId).select('-password');
-        return res.json({ success: true, user });
+        return res.status(200).json({ success: true, user });
       }
     }
 
-    // 2️⃣ Якщо accessToken протух → пробуємо refreshToken
+    // 2️⃣ Пробуємо refreshToken
     if (refreshToken) {
       const oldSession = await Session.findOne({ refreshToken });
 
       if (!oldSession) {
-        return next(createHttpError(401, 'Invalid refresh token'));
+        return res.status(200).json({ success: false });
       }
 
-      const refreshExpired =
+      const isExpired =
         new Date() > new Date(oldSession.refreshTokenValidUntil);
 
-      if (refreshExpired) {
+      if (isExpired) {
         await Session.deleteOne({ _id: oldSession._id });
-        return next(createHttpError(401, 'Refresh token expired'));
+        return res.status(200).json({ success: false });
       }
 
-      // 3️⃣ Створюємо нову сесію
+      // 🔄 створюємо нову сесію
       const newSession = await createSession(oldSession.userId);
-
-      // ❗ дуже важливо — видаляємо стару
-      await Session.deleteOne({ _id: oldSession._id });
-
-      // 4️⃣ Проставляємо нові кукі
       setSessionCookies(res, newSession);
 
-      // 5️⃣ Повертаємо юзера
+      // ❗ очищаємо попередню
+      await Session.deleteOne({ _id: oldSession._id });
+
       const user = await User.findById(oldSession.userId).select('-password');
 
-      return res.json({ success: true, user, refreshed: true });
+      return res.status(200).json({
+        success: true,
+        refreshed: true,
+        user,
+      });
     }
 
-    return next(createHttpError(401, 'Unauthorized'));
+    return res.status(200).json({ success: false });
   } catch (error) {
-    next(error);
+    console.log(error);
+    return res.status(200).json({ success: false });
   }
 };
 

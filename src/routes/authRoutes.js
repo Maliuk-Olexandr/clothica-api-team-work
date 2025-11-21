@@ -5,7 +5,6 @@ import {
   registerUser,
   loginUser,
   logoutUser,
-  refreshUserSession,
   getSession,
   requestResetPhone,
   resetPassword,
@@ -28,8 +27,6 @@ router.post('/api/auth/reset-password', celebrate(resetPasswordSchema), resetPas
 router.get('/api/auth/session', getSession);
 //protected routes
 router.post('/api/auth/logout', authenticate, logoutUser);
-router.post('/api/auth/refresh', authenticate, refreshUserSession);
-router.post('/api/auth/session', authenticate, refreshUserSession);
 
 export default router;
 
@@ -52,33 +49,25 @@ export default router;
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - username
- *               - phone
- *               - password
- *             properties:
- *               username:
- *                 type: string
- *                 example: "Олександр"
- *               phone:
- *                 type: string
- *                 example: "+380501234567"
- *               password:
- *                 type: string
- *                 example: "mysecurepassword"
+ *             $ref: '#/components/schemas/RegisterUser'
  *     responses:
  *       201:
- *         description: Користувач успішно зареєстрований
+ *         description: User successfully registered
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
  *       400:
- *         description: Користувач з таким номером уже існує
- */
-
-/**
- * @swagger
+ *         description: User with this phone number already exists
+ *
  * /api/auth/login:
  *   post:
- *     summary: Вхід користувача
+ *     summary: Логін користувача
  *     tags: [Auth]
  *     security: []
  *     requestBody:
@@ -86,55 +75,55 @@ export default router;
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - phone
- *               - password
- *             properties:
- *               phone:
- *                 type: string
- *                 example: "+380501234567"
- *               password:
- *                 type: string
- *                 example: "mysecurepassword"
+ *             $ref: '#/components/schemas/LoginUser'
  *     responses:
  *       200:
- *         description: Успішний вхід
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
  *       401:
- *         description: Невірний номер або пароль
- */
-
-/**
- * @swagger
+ *         description: Invalid phone number or password
+ *
  * /api/auth/logout:
  *   post:
- *     summary: Вихід користувача (очищення cookie)
+ *     summary: Вихід користувача
  *     tags: [Auth]
+ *     security:
+ *       - cookieAuth: []
  *     responses:
  *       204:
- *         description: Успішний вихід
- */
-
-/**
- * @swagger
- * /api/auth/refresh:
- *   post:
- *     summary: Оновлення сесії користувача
+ *         description: Successfully logged out
+ *
+ * /api/auth/session:
+ *   get:
+ *     summary: Отримати поточного користувача / автоновий refresh
  *     tags: [Auth]
+ *     security: []
  *     responses:
  *       200:
- *         description: Сесію оновлено
- *       401:
- *         description: Сесія не знайдена або прострочена
- */
-
-/**
- * @swagger
+ *         description: Session info
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 refreshed:
+ *                   type: boolean
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
  * /api/auth/request-reset-phone:
  *   post:
  *     summary: Запит на скидання пароля через телефон
  *     tags: [Auth]
- *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -146,19 +135,22 @@ export default router;
  *             properties:
  *               phone:
  *                 type: string
- *                 example: "+380501234567"
+ *                 example: '+380501234567'
  *     responses:
  *       200:
- *         description: Якщо користувач існує — SMS з токеном надіслано
- */
-
-/**
- * @swagger
+ *         description: SMS with reset token sent (or generic success if user doesn't exist)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *
  * /api/auth/reset-password:
  *   post:
- *     summary: Скидання пароля користувача
+ *     summary: Скидання пароля за токеном
  *     tags: [Auth]
- *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -171,15 +163,24 @@ export default router;
  *             properties:
  *               token:
  *                 type: string
- *                 example: "eyJhbGciOiJIUzI1NiIsInR5..."
+ *                 description: JWT токен для скидання пароля
  *               password:
  *                 type: string
- *                 example: "newsecurepassword"
+ *                 description: Новий пароль користувача
+ *                 minLength: 8
+ *                 maxLength: 128
  *     responses:
  *       200:
- *         description: Пароль оновлено
+ *         description: Password successfully updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  *       401:
- *         description: Токен недійсний або прострочений
+ *         description: Invalid or expired token
  *       404:
- *         description: Користувач не знайдений
+ *         description: User not found
  */
