@@ -17,10 +17,9 @@ const router = Router();
 router.post('/api/orders', celebrate(createOrderSchema), createOrder);
 
 //protected routes
-router.use(authenticate);
-router.get('/api/orders', celebrate(getAllOrdersSchema), getAllOrders);
-router.get('/api/orders/:orderId', celebrate(getOrderByIdSchema), getOrderById);
-router.patch('/api/orders/:orderId/status', celebrate(updateOrderStatusSchema), updateOrderStatus);
+router.get('/api/orders',authenticate, celebrate(getAllOrdersSchema), getAllOrders);
+router.get('/api/orders/:orderId', authenticate, celebrate(getOrderByIdSchema), getOrderById);
+router.patch('/api/orders/:orderId/status', authenticate, celebrate(updateOrderStatusSchema), updateOrderStatus);
 
 export default router;
 

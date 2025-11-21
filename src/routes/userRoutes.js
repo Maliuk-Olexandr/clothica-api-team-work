@@ -12,7 +12,6 @@ import { updateUserSchema } from '../validations/userValidation.js';
 
 const router = Router();
 
-router.use(authenticate);
 
 // router.patch(
 //   '/users/me/avatar',
@@ -20,8 +19,8 @@ router.use(authenticate);
 //   updateUserAvatar,
 // );
 
-router.get('/api/users/me', getCurrentUser);
-router.patch('/api/users/me', celebrate(updateUserSchema), updateUser);
+router.get('/api/users/me', authenticate, getCurrentUser);
+router.patch('/api/users/me', authenticate, celebrate(updateUserSchema), updateUser);
 
 export default router;
 
